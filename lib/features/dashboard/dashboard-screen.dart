@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../add-item/add-item-screen.dart';
-import 'item-details-screen.dart';
+import '../item-details/item-details-screen.dart';
 // -------------------------------
 // Dashboard Page
 // -------------------------------

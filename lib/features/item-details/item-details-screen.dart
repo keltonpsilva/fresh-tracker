@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'dashboard-screen.dart';
+import '../dashboard/dashboard-screen.dart';
 
 class ItemDetailsScreen extends StatelessWidget {
   final FoodItem item;
