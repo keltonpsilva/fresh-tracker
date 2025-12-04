@@ -23,6 +23,7 @@ class FoodItemServiceInMemory implements IFoodItemService {
       statusColor: Colors.red,
       icon: Icons.egg,
       iconBackgroundColor: const Color(0xFFFFE5E5),
+      purchaseDate: DateTime.now().subtract(const Duration(days: 8)),
     ),
     FoodItem(
       name: 'Milk',
@@ -57,6 +58,7 @@ class FoodItemServiceInMemory implements IFoodItemService {
       statusColor: Colors.green,
       icon: Icons.eco,
       iconBackgroundColor: const Color(0xFFE5F5E5),
+      purchaseDate: DateTime.now().subtract(const Duration(days: 2)),
     ),
     FoodItem(
       name: 'Yogurt',
@@ -66,6 +68,7 @@ class FoodItemServiceInMemory implements IFoodItemService {
       statusColor: Colors.green,
       icon: Icons.lunch_dining,
       iconBackgroundColor: const Color(0xFFE5F5E5),
+      purchaseDate: DateTime.now().subtract(const Duration(days: 1)),
     ),
   ];
 

@@ -32,9 +32,7 @@ class ItemDetailsScreen extends StatelessWidget {
 
   double _getFreshnessProgress() {
     final now = DateTime.now();
-    final purchaseDate =
-        item.purchaseDate ??
-        item.expirationDate.subtract(const Duration(days: 7));
+    final purchaseDate = item.purchaseDate;
     final totalDays = item.expirationDate.difference(purchaseDate).inDays;
     final remainingDays = item.expirationDate.difference(now).inDays;
 
@@ -60,9 +58,7 @@ class ItemDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final purchaseDate =
-        item.purchaseDate ??
-        item.expirationDate.subtract(const Duration(days: 7));
+    final purchaseDate = item.purchaseDate;
     final freshnessProgress = _getFreshnessProgress();
     final freshnessColor = _getFreshnessColor();
     final daysRemaining = item.expirationDate.difference(DateTime.now()).inDays;

@@ -20,7 +20,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
 
   String? _selectedCategory;
   int _quantity = 1;
-  DateTime? _purchaseDate;
+  late DateTime _purchaseDate;
   DateTime? _expirationDate;
 
   @override
@@ -29,7 +29,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
     // Set purchase date to today by default
     _purchaseDate = DateTime.now();
     _purchaseDateController.text =
-        '${_purchaseDate!.month}/${_purchaseDate!.day}/${_purchaseDate!.year}';
+        '${_purchaseDate.month}/${_purchaseDate.day}/${_purchaseDate.year}';
   }
 
   final List<String> _categories = [
@@ -53,7 +53,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
   Future<void> _selectPurchaseDate() async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: _purchaseDate ?? DateTime.now(),
+      initialDate: _purchaseDate,
       firstDate: DateTime(2020),
       lastDate: DateTime.now(),
     );
@@ -174,7 +174,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
       statusColor: statusColor,
       icon: icon,
       iconBackgroundColor: iconBackgroundColor,
-      purchaseDate: _purchaseDate,
+      purchaseDate: _purchaseDate, // Now always required
       quantity: _quantity,
       quantityUnit: 'unit',
     );

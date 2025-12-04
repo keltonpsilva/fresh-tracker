@@ -8,7 +8,7 @@ class FoodItem {
   final Color statusColor;
   final IconData icon;
   final Color iconBackgroundColor;
-  final DateTime? purchaseDate;
+  final DateTime purchaseDate;
   final int? quantity;
   final String? quantityUnit;
   final String? notes;
@@ -21,7 +21,7 @@ class FoodItem {
     required this.statusColor,
     required this.icon,
     required this.iconBackgroundColor,
-    this.purchaseDate,
+    required this.purchaseDate,
     this.quantity,
     this.quantityUnit,
     this.notes,

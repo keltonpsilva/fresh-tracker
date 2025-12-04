@@ -6,7 +6,7 @@ import '../../shared/services/food_item_service_factory.dart';
 
 class EditItemScreen extends StatefulWidget {
   final FoodItem item;
-  
+
   const EditItemScreen({super.key, required this.item});
 
   @override
@@ -22,7 +22,7 @@ class _EditItemScreenState extends State<EditItemScreen> {
 
   String? _selectedCategory;
   int _quantity = 1;
-  DateTime? _purchaseDate;
+  late DateTime _purchaseDate;
   DateTime? _expirationDate;
   late FoodItem _oldItem;
 
@@ -39,20 +39,21 @@ class _EditItemScreenState extends State<EditItemScreen> {
   @override
   void initState() {
     super.initState();
-    
+
     // Pre-fill form with existing item data
     _oldItem = widget.item;
     _itemNameController.text = _oldItem.name;
     _selectedCategory = _oldItem.category;
     _quantity = _oldItem.quantity ?? 1;
-    _purchaseDate = _oldItem.purchaseDate;
     _expirationDate = _oldItem.expirationDate;
-    
-    if (_purchaseDate != null) {
-      _purchaseDateController.text =
-          '${_purchaseDate!.month}/${_purchaseDate!.day}/${_purchaseDate!.year}';
-    }
-    
+
+    // Set purchase date - use existing or default to expiration date minus 7 days
+    _purchaseDate =
+        _oldItem.purchaseDate ??
+        _oldItem.expirationDate.subtract(const Duration(days: 7));
+    _purchaseDateController.text =
+        '${_purchaseDate.month}/${_purchaseDate.day}/${_purchaseDate.year}';
+
     if (_expirationDate != null) {
       _expirationDateController.text =
           '${_expirationDate!.month.toString().padLeft(2, '0')}/${_expirationDate!.day.toString().padLeft(2, '0')}/${_expirationDate!.year}';
@@ -70,7 +71,7 @@ class _EditItemScreenState extends State<EditItemScreen> {
   Future<void> _selectPurchaseDate() async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: _purchaseDate ?? DateTime.now(),
+      initialDate: _purchaseDate,
       firstDate: DateTime(2020),
       lastDate: DateTime.now(),
     );
@@ -191,7 +192,7 @@ class _EditItemScreenState extends State<EditItemScreen> {
       statusColor: statusColor,
       icon: icon,
       iconBackgroundColor: iconBackgroundColor,
-      purchaseDate: _purchaseDate,
+      purchaseDate: _purchaseDate, // Now always required
       quantity: _quantity,
       quantityUnit: _oldItem.quantityUnit ?? 'unit',
       notes: _oldItem.notes, // Preserve notes when editing
@@ -200,9 +201,9 @@ class _EditItemScreenState extends State<EditItemScreen> {
     await _foodItemService.updateItem(_oldItem, foodItem);
 
     if (mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Item updated successfully!')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Item updated successfully!')),
+      );
       Navigator.of(context).pop();
     }
   }
@@ -499,4 +500,3 @@ class _EditItemScreenState extends State<EditItemScreen> {
     );
   }
 }
-

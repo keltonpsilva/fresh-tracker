@@ -27,6 +27,7 @@ class FoodItemService implements IFoodItemService {
       statusColor: Colors.red,
       icon: Icons.egg,
       iconBackgroundColor: const Color(0xFFFFE5E5),
+      purchaseDate: DateTime.now().subtract(const Duration(days: 8)),
     ),
     FoodItem(
       name: 'Milk',
@@ -61,6 +62,7 @@ class FoodItemService implements IFoodItemService {
       statusColor: Colors.green,
       icon: Icons.eco,
       iconBackgroundColor: const Color(0xFFE5F5E5),
+      purchaseDate: DateTime.now().subtract(const Duration(days: 2)),
     ),
     FoodItem(
       name: 'Yogurt',
@@ -70,6 +72,7 @@ class FoodItemService implements IFoodItemService {
       statusColor: Colors.green,
       icon: Icons.lunch_dining,
       iconBackgroundColor: const Color(0xFFE5F5E5),
+      purchaseDate: DateTime.now().subtract(const Duration(days: 1)),
     ),
   ];
 
@@ -129,7 +132,7 @@ class FoodItemService implements IFoodItemService {
       'status_color': item.statusColor.value,
       'icon_code_point': item.icon.codePoint,
       'icon_background_color': item.iconBackgroundColor.value,
-      'purchase_date': item.purchaseDate?.millisecondsSinceEpoch,
+      'purchase_date': item.purchaseDate.millisecondsSinceEpoch,
       'quantity': item.quantity,
       'quantity_unit': item.quantityUnit,
       'notes': item.notes,
@@ -152,7 +155,9 @@ class FoodItemService implements IFoodItemService {
       iconBackgroundColor: Color(map['icon_background_color'] as int),
       purchaseDate: map['purchase_date'] != null
           ? DateTime.fromMillisecondsSinceEpoch(map['purchase_date'] as int)
-          : null,
+          : DateTime.fromMillisecondsSinceEpoch(
+              map['expiration_date'] as int,
+            ).subtract(const Duration(days: 7)),
       quantity: map['quantity'] as int?,
       quantityUnit: map['quantity_unit'] as String?,
       notes: map['notes'] as String?,
