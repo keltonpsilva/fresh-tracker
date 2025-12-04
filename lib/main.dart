@@ -83,7 +83,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
   void _onSignInPressed(BuildContext context) {
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (context) => const DashboardPage()),
+      MaterialPageRoute(builder: (context) => const DashboardScreen()),
     );
   }
 
@@ -395,14 +395,14 @@ class FoodItem {
   }
 }
 
-class DashboardPage extends StatefulWidget {
-  const DashboardPage({super.key});
+class DashboardScreen extends StatefulWidget {
+  const DashboardScreen({super.key});
 
   @override
-  State<DashboardPage> createState() => _DashboardPageState();
+  State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
-class _DashboardPageState extends State<DashboardPage> {
+class _DashboardScreenState extends State<DashboardScreen> {
   String _selectedCategory = 'All';
   final TextEditingController _searchController = TextEditingController();
 
