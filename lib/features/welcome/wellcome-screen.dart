@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../dashboard/dashboard-screen.dart';
+
 import '../../shared/services/food_item_service_factory.dart';
+import '../../shared/services/app_preferences_service.dart';
 
 class OnboardingSlide {
   final String title;
@@ -64,10 +66,15 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     }
   }
 
-  void _onSignInPressed(BuildContext context) {
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (context) => const DashboardScreen()),
-    );
+  Future<void> _onSignInPressed(BuildContext context) async {
+    // Mark first launch as complete
+    await AppPreferencesService.setFirstLaunchComplete();
+
+    if (context.mounted) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const DashboardScreen()),
+      );
+    }
   }
 
   Future<void> _onImportDemoDataPressed(BuildContext context) async {
