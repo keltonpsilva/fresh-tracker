@@ -1,9 +1,12 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../add-item/add-item-screen.dart';
 import '../item-details/item-details-screen.dart';
 import '../../shared/models/food_item.dart';
+import '../../shared/services/i_food_item_service.dart';
 import '../../shared/services/food_item_service.dart';
+import '../../shared/services/food_item_service_in_memory.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -13,11 +16,19 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  final FoodItemService _foodItemService = FoodItemService();
+  late final IFoodItemService _foodItemService;
   String _selectedCategory = 'All';
   final TextEditingController _searchController = TextEditingController();
   List<FoodItem> _filteredItems = [];
   bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    // Use in-memory service for web, SQLite service for other platforms
+    _foodItemService = kIsWeb ? FoodItemServiceInMemory() : FoodItemService();
+    _loadItems();
+  }
 
   List<String> get _categories => _foodItemService.getCategories();
 
@@ -38,12 +49,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
         _isLoading = false;
       });
     }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _loadItems();
   }
 
   @override

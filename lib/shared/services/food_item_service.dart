@@ -3,8 +3,9 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 import '../models/food_item.dart';
+import 'i_food_item_service.dart';
 
-class FoodItemService {
+class FoodItemService implements IFoodItemService {
   static final FoodItemService _instance = FoodItemService._internal();
   factory FoodItemService() => _instance;
   FoodItemService._internal();
