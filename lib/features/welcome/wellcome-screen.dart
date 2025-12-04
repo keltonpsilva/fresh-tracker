@@ -141,12 +141,14 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
               const SizedBox(height: 32),
 
-              // Get Started Button
+              // Next / Sign In Button
               SizedBox(
                 width: double.infinity,
                 height: 56,
                 child: ElevatedButton(
-                  onPressed: () => _onGetStartedPressed(context),
+                  onPressed: _currentPage < _slides.length - 1
+                      ? () => _onGetStartedPressed(context)
+                      : () => _onSignInPressed(context),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF4CAF50),
                     foregroundColor: Colors.white,
@@ -164,21 +166,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   ),
                 ),
               ),
-
-              // Sign In (only show on last slide)
-              if (_currentPage == _slides.length - 1) ...[
-                const SizedBox(height: 16),
-                TextButton(
-                  onPressed: () => _onSignInPressed(context),
-                  style: TextButton.styleFrom(
-                    foregroundColor: Colors.grey[600],
-                  ),
-                  child: const Text(
-                    'Sign In',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                  ),
-                ),
-              ],
 
               const SizedBox(height: 32),
             ],
