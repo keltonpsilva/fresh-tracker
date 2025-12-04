@@ -44,19 +44,17 @@ class _EditItemScreenState extends State<EditItemScreen> {
     _oldItem = widget.item;
     _itemNameController.text = _oldItem.name;
     _selectedCategory = _oldItem.category;
-    _quantity = _oldItem.quantity ?? 1;
+    _quantity = _oldItem.quantity;
     _expirationDate = _oldItem.expirationDate;
 
-    // Set purchase date - use existing or default to expiration date minus 7 days
-    _purchaseDate =
-        _oldItem.purchaseDate ??
-        _oldItem.expirationDate.subtract(const Duration(days: 7));
+    // Set purchase date - now always required
+    _purchaseDate = _oldItem.purchaseDate;
     _purchaseDateController.text =
-        '${_purchaseDate.month}/${_purchaseDate.day}/${_purchaseDate.year}';
+        '${_purchaseDate.day.toString().padLeft(2, '0')}/${_purchaseDate.month.toString().padLeft(2, '0')}/${_purchaseDate.year}';
 
     if (_expirationDate != null) {
       _expirationDateController.text =
-          '${_expirationDate!.month.toString().padLeft(2, '0')}/${_expirationDate!.day.toString().padLeft(2, '0')}/${_expirationDate!.year}';
+          '${_expirationDate!.day.toString().padLeft(2, '0')}/${_expirationDate!.month.toString().padLeft(2, '0')}/${_expirationDate!.year}';
     }
   }
 
@@ -79,7 +77,7 @@ class _EditItemScreenState extends State<EditItemScreen> {
       setState(() {
         _purchaseDate = picked;
         _purchaseDateController.text =
-            '${picked.month}/${picked.day}/${picked.year}';
+            '${picked.day.toString().padLeft(2, '0')}/${picked.month.toString().padLeft(2, '0')}/${picked.year}';
       });
     }
   }
@@ -96,7 +94,7 @@ class _EditItemScreenState extends State<EditItemScreen> {
       setState(() {
         _expirationDate = picked;
         _expirationDateController.text =
-            '${picked.month.toString().padLeft(2, '0')}/${picked.day.toString().padLeft(2, '0')}/${picked.year}';
+            '${picked.day.toString().padLeft(2, '0')}/${picked.month.toString().padLeft(2, '0')}/${picked.year}';
       });
     }
   }
@@ -194,7 +192,7 @@ class _EditItemScreenState extends State<EditItemScreen> {
       iconBackgroundColor: iconBackgroundColor,
       purchaseDate: _purchaseDate, // Now always required
       quantity: _quantity,
-      quantityUnit: _oldItem.quantityUnit ?? 'unit',
+      quantityUnit: _oldItem.quantityUnit, // Now always required
       notes: _oldItem.notes, // Preserve notes when editing
     );
 
@@ -412,7 +410,7 @@ class _EditItemScreenState extends State<EditItemScreen> {
                       readOnly: true,
                       onTap: _selectPurchaseDate,
                       decoration: InputDecoration(
-                        hintText: 'mm/dd/yyyy',
+                        hintText: 'dd/mm/yyyy',
                         filled: true,
                         fillColor: const Color(0xFFF5F5F5),
                         border: OutlineInputBorder(
@@ -447,7 +445,7 @@ class _EditItemScreenState extends State<EditItemScreen> {
                       readOnly: true,
                       onTap: _selectExpirationDate,
                       decoration: InputDecoration(
-                        hintText: 'mm/dd/yyyy',
+                        hintText: 'dd/mm/yyyy',
                         filled: true,
                         fillColor: const Color(0xFFF5F5F5),
                         border: OutlineInputBorder(

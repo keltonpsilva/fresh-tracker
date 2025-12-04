@@ -29,7 +29,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
     // Set purchase date to today by default
     _purchaseDate = DateTime.now();
     _purchaseDateController.text =
-        '${_purchaseDate.month}/${_purchaseDate.day}/${_purchaseDate.year}';
+        '${_purchaseDate.day.toString().padLeft(2, '0')}/${_purchaseDate.month.toString().padLeft(2, '0')}/${_purchaseDate.year}';
   }
 
   final List<String> _categories = [
@@ -61,7 +61,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
       setState(() {
         _purchaseDate = picked;
         _purchaseDateController.text =
-            '${picked.month}/${picked.day}/${picked.year}';
+            '${picked.day.toString().padLeft(2, '0')}/${picked.month.toString().padLeft(2, '0')}/${picked.year}';
       });
     }
   }
@@ -78,7 +78,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
       setState(() {
         _expirationDate = picked;
         _expirationDateController.text =
-            '${picked.month.toString().padLeft(2, '0')}/${picked.day.toString().padLeft(2, '0')}/${picked.year}';
+            '${picked.day.toString().padLeft(2, '0')}/${picked.month.toString().padLeft(2, '0')}/${picked.year}';
       });
     }
   }
@@ -176,7 +176,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
       iconBackgroundColor: iconBackgroundColor,
       purchaseDate: _purchaseDate, // Now always required
       quantity: _quantity,
-      quantityUnit: 'unit',
+      quantityUnit: 'unit', // Now always required
     );
 
     await _foodItemService.addItem(foodItem);
@@ -393,7 +393,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
                       readOnly: true,
                       onTap: _selectPurchaseDate,
                       decoration: InputDecoration(
-                        hintText: 'mm/dd/yyyy',
+                        hintText: 'dd/mm/yyyy',
                         filled: true,
                         fillColor: const Color(0xFFF5F5F5),
                         border: OutlineInputBorder(
@@ -428,7 +428,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
                       readOnly: true,
                       onTap: _selectExpirationDate,
                       decoration: InputDecoration(
-                        hintText: 'mm/dd/yyyy',
+                        hintText: 'dd/mm/yyyy',
                         filled: true,
                         fillColor: const Color(0xFFF5F5F5),
                         border: OutlineInputBorder(

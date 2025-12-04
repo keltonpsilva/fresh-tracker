@@ -27,7 +27,7 @@ class ItemDetailsScreen extends StatelessWidget {
       'November',
       'December',
     ];
-    return '${months[date.month - 1]} ${date.day}, ${date.year}';
+    return '${date.day} ${months[date.month - 1]} ${date.year}';
   }
 
   double _getFreshnessProgress() {
@@ -50,10 +50,7 @@ class ItemDetailsScreen extends StatelessWidget {
   }
 
   String _getQuantityText() {
-    if (item.quantity != null) {
-      return '${item.quantity} ${item.quantityUnit ?? 'unit'}';
-    }
-    return '1 unit';
+    return '${item.quantity} ${item.quantityUnit}';
   }
 
   @override
