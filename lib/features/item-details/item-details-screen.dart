@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../shared/models/food_item.dart';
 import '../../shared/services/i_food_item_service.dart';
 import '../../shared/services/food_item_service_factory.dart';
+import '../edit-item/edit-item-screen.dart';
 
 class ItemDetailsScreen extends StatelessWidget {
   final FoodItem item;
@@ -261,11 +262,16 @@ class ItemDetailsScreen extends StatelessWidget {
                   ),
                   child: IconButton(
                     icon: const Icon(Icons.edit, color: Color(0xFF2C2C2C)),
-                    onPressed: () {
-                      // TODO: Navigate to edit screen
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Edit item')),
+                    onPressed: () async {
+                      await Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => EditItemScreen(item: item),
+                        ),
                       );
+                      // Reload the item details by popping and letting parent refresh
+                      if (context.mounted) {
+                        Navigator.of(context).pop();
+                      }
                     },
                   ),
                 ),
