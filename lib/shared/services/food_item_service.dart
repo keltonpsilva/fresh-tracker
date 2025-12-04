@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../models/food_item.dart';
 import 'i_food_item_service.dart';
@@ -10,7 +14,7 @@ class FoodItemService implements IFoodItemService {
   factory FoodItemService() => _instance;
   FoodItemService._internal();
 
-  static Database? _database;
+  // static Database? _database;
   static const String _tableName = 'food_items';
 
   // Demo food items for seeding the database
@@ -69,36 +73,49 @@ class FoodItemService implements IFoodItemService {
     ),
   ];
 
+  Database? _database;
+
   Future<Database> get database async {
     if (_database != null) return _database!;
-    _database = await _initDatabase();
+    _database = await _initDatabase(importDemo: true); // or false if you want
     return _database!;
   }
 
-  Future<Database> _initDatabase() async {
-    final dbPath = await getDatabasesPath();
-    final path = join(dbPath, 'food_items.db');
+  Future<Database> _initDatabase({bool importDemo = false}) async {
+    // 1. Get safe documents directory
+    final documentsDir = await getApplicationDocumentsDirectory();
+    await Directory(documentsDir.path).create(recursive: true);
+    final dbPath = join(documentsDir.path, 'food_items.db');
 
+    // 2. Copy demo DB from assets if requested
+    if (importDemo && !await File(dbPath).exists()) {
+      final data = await rootBundle.load('assets/food_items.db');
+      final bytes = data.buffer.asUint8List();
+      await File(dbPath).writeAsBytes(bytes, flush: true);
+    }
+
+    // 3. Open the database
     return await openDatabase(
-      path,
+      dbPath,
       version: 1,
       onCreate: (db, version) async {
+        // Only called if database is new
         await db.execute('''
-          CREATE TABLE $_tableName (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            category TEXT NOT NULL,
-            subcategory TEXT NOT NULL,
-            expiration_date INTEGER NOT NULL,
-            status_color INTEGER NOT NULL,
-            icon_code_point INTEGER NOT NULL,
-            icon_background_color INTEGER NOT NULL,
-            purchase_date INTEGER,
-            quantity INTEGER,
-            quantity_unit TEXT,
-            notes TEXT
-          )
-        ''');
+        CREATE TABLE $_tableName (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          name TEXT NOT NULL,
+          category TEXT NOT NULL,
+          subcategory TEXT NOT NULL,
+          expiration_date INTEGER NOT NULL,
+          status_color INTEGER NOT NULL,
+          icon_code_point INTEGER NOT NULL,
+          icon_background_color INTEGER NOT NULL,
+          purchase_date INTEGER,
+          quantity INTEGER,
+          quantity_unit TEXT,
+          notes TEXT
+        )
+      ''');
       },
     );
   }
