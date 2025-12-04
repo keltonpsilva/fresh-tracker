@@ -98,16 +98,8 @@ class FoodItemService {
             notes TEXT
           )
         ''');
-        // Seed database with demo items
-        await _seedDatabase(db);
       },
     );
-  }
-
-  Future<void> _seedDatabase(Database db) async {
-    for (final item in _demoFoodItems) {
-      await db.insert(_tableName, _foodItemToMap(item));
-    }
   }
 
   Map<String, dynamic> _foodItemToMap(FoodItem item) {
@@ -258,5 +250,13 @@ class FoodItemService {
       }
     }
     return 0;
+  }
+
+  // Import demo data into the database
+  Future<void> importDemoData() async {
+    final db = await database;
+    for (final item in _demoFoodItems) {
+      await db.insert(_tableName, _foodItemToMap(item));
+    }
   }
 }

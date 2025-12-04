@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../dashboard/dashboard-screen.dart';
+import '../../shared/services/food_item_service.dart';
 
 class OnboardingSlide {
   final String title;
@@ -67,6 +68,33 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(builder: (context) => const DashboardScreen()),
     );
+  }
+
+  Future<void> _onImportDemoDataPressed(BuildContext context) async {
+    try {
+      final service = FoodItemService();
+      await service.importDemoData();
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Demo data imported successfully!'),
+            duration: Duration(seconds: 2),
+            backgroundColor: Color(0xFF4CAF50),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error importing demo data: $e'),
+            duration: const Duration(seconds: 2),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -166,6 +194,32 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   ),
                 ),
               ),
+
+              // Import Demo Data Button (only on last slide)
+              if (_currentPage == _slides.length - 1) ...[
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: OutlinedButton(
+                    onPressed: () => _onImportDemoDataPressed(context),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: const Color(0xFF4CAF50),
+                      side: const BorderSide(color: Color(0xFF4CAF50), width: 2),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text(
+                      'Import Demo Data',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
 
               const SizedBox(height: 32),
             ],
