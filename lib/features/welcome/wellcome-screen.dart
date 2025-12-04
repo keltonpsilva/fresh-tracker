@@ -106,15 +106,14 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
             children: [
-              const Spacer(flex: 2),
+              const SizedBox(height: 20),
 
               // Refrigerator Illustration
               _buildRefrigeratorIllustration(),
-              const SizedBox(height: 40),
+              const SizedBox(height: 32),
 
               // Title & Subtitle Slider
               Expanded(
-                flex: 2,
                 child: PageView.builder(
                   controller: _pageController,
                   onPageChanged: (index) {
@@ -125,35 +124,38 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   itemCount: _slides.length,
                   itemBuilder: (context, index) {
                     final slide = _slides[index];
-                    return Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          slide.title,
-                          style: const TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF2C2C2C),
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            slide.title,
+                            style: const TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF2C2C2C),
+                            ),
+                            textAlign: TextAlign.center,
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          slide.subtitle,
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey[600],
-                            height: 1.5,
+                          const SizedBox(height: 16),
+                          Text(
+                            slide.subtitle,
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.grey[600],
+                              height: 1.5,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
+                        ],
+                      ),
                     );
                   },
                 ),
               ),
 
-              const Spacer(flex: 1),
+              const SizedBox(height: 16),
 
               // Pagination Dots
               Row(
