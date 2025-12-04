@@ -5,10 +5,7 @@ import 'dashboard-screen.dart';
 class ItemDetailsScreen extends StatelessWidget {
   final FoodItem item;
 
-  const ItemDetailsScreen({
-    super.key,
-    required this.item,
-  });
+  const ItemDetailsScreen({super.key, required this.item});
 
   String _formatDate(DateTime date) {
     const months = [
@@ -23,20 +20,22 @@ class ItemDetailsScreen extends StatelessWidget {
       'September',
       'October',
       'November',
-      'December'
+      'December',
     ];
     return '${months[date.month - 1]} ${date.day}, ${date.year}';
   }
 
   double _getFreshnessProgress() {
     final now = DateTime.now();
-    final purchaseDate = item.purchaseDate ?? item.expirationDate.subtract(const Duration(days: 7));
+    final purchaseDate =
+        item.purchaseDate ??
+        item.expirationDate.subtract(const Duration(days: 7));
     final totalDays = item.expirationDate.difference(purchaseDate).inDays;
     final remainingDays = item.expirationDate.difference(now).inDays;
-    
+
     if (totalDays <= 0) return 0.0;
     if (remainingDays <= 0) return 0.0;
-    
+
     return (remainingDays / totalDays).clamp(0.0, 1.0);
   }
 
@@ -56,7 +55,9 @@ class ItemDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final purchaseDate = item.purchaseDate ?? item.expirationDate.subtract(const Duration(days: 7));
+    final purchaseDate =
+        item.purchaseDate ??
+        item.expirationDate.subtract(const Duration(days: 7));
     final freshnessProgress = _getFreshnessProgress();
     final freshnessColor = _getFreshnessColor();
     final daysRemaining = item.expirationDate.difference(DateTime.now()).inDays;
@@ -135,10 +136,10 @@ class ItemDetailsScreen extends StatelessWidget {
                           daysRemaining < 0
                               ? 'Expired ${-daysRemaining} ${-daysRemaining == 1 ? 'day' : 'days'} ago'
                               : daysRemaining == 0
-                                  ? 'Expires today'
-                                  : daysRemaining == 1
-                                      ? 'Expires Tomorrow'
-                                      : 'Expires in $daysRemaining days',
+                              ? 'Expires today'
+                              : daysRemaining == 1
+                              ? 'Expires Tomorrow'
+                              : 'Expires in $daysRemaining days',
                           style: TextStyle(
                             fontSize: 14,
                             color: freshnessColor,
@@ -273,7 +274,9 @@ class ItemDetailsScreen extends StatelessWidget {
                       onPressed: () {
                         // TODO: Mark as consumed
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Item marked as consumed')),
+                          const SnackBar(
+                            content: Text('Item marked as consumed'),
+                          ),
                         );
                         Navigator.of(context).pop();
                       },
@@ -312,7 +315,9 @@ class ItemDetailsScreen extends StatelessWidget {
                         context: context,
                         builder: (context) => AlertDialog(
                           title: const Text('Delete Item'),
-                          content: const Text('Are you sure you want to delete this item?'),
+                          content: const Text(
+                            'Are you sure you want to delete this item?',
+                          ),
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.of(context).pop(),
@@ -366,10 +371,7 @@ class ItemDetailsScreen extends StatelessWidget {
         Expanded(
           child: Text(
             label,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[600],
-            ),
+            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
           ),
         ),
         Text(
@@ -384,4 +386,3 @@ class ItemDetailsScreen extends StatelessWidget {
     );
   }
 }
-
