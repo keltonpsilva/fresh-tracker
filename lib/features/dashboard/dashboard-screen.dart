@@ -2,55 +2,11 @@ import 'package:flutter/material.dart';
 
 import '../add-item/add-item-screen.dart';
 import '../item-details/item-details-screen.dart';
+import '../models/food_item.dart';
+import '../services/food_item_service.dart';
 // -------------------------------
 // Dashboard Page
 // -------------------------------
-
-class FoodItem {
-  final String name;
-  final String category;
-  final String subcategory;
-  final DateTime expirationDate;
-  final Color statusColor;
-  final IconData icon;
-  final Color iconBackgroundColor;
-  final DateTime? purchaseDate;
-  final int? quantity;
-  final String? quantityUnit;
-  final String? notes;
-
-  FoodItem({
-    required this.name,
-    required this.category,
-    required this.subcategory,
-    required this.expirationDate,
-    required this.statusColor,
-    required this.icon,
-    required this.iconBackgroundColor,
-    this.purchaseDate,
-    this.quantity,
-    this.quantityUnit,
-    this.notes,
-  });
-
-  String get expirationStatus {
-    final now = DateTime.now();
-    final difference = expirationDate.difference(now).inDays;
-
-    if (difference < 0) {
-      if (difference == -1) {
-        return 'Expired yesterday';
-      }
-      return 'Expired ${-difference} days ago';
-    } else if (difference == 0) {
-      return 'Expires today';
-    } else if (difference == 1) {
-      return 'Expires Tomorrow';
-    } else {
-      return 'Expires in $difference days';
-    }
-  }
-}
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -60,101 +16,17 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
+  final FoodItemService _foodItemService = FoodItemService();
   String _selectedCategory = 'All';
   final TextEditingController _searchController = TextEditingController();
 
-  final List<String> _categories = [
-    'All',
-    'Produce',
-    'Dairy',
-    'Meat',
-    'Expiring',
-  ];
-
-  final List<FoodItem> _foodItems = [
-    FoodItem(
-      name: 'Organic Eggs',
-      category: 'Dairy',
-      subcategory: 'Dairy & Eggs',
-      expirationDate: DateTime.now().subtract(const Duration(days: 1)),
-      statusColor: Colors.red,
-      icon: Icons.egg,
-      iconBackgroundColor: const Color(0xFFFFE5E5),
-    ),
-    FoodItem(
-      name: 'Milk',
-      category: 'Dairy',
-      subcategory: 'Dairy',
-      expirationDate: DateTime.now().add(const Duration(days: 1)),
-      statusColor: Colors.orange,
-      icon: Icons.water_drop,
-      iconBackgroundColor: const Color(0xFFFFF4E5),
-      purchaseDate: DateTime.now().subtract(const Duration(days: 6)),
-      quantity: 1,
-      quantityUnit: 'Gallon',
-      notes: 'Opened recently. Keep in the main compartment, not the door.',
-    ),
-    FoodItem(
-      name: 'Chicken Breast',
-      category: 'Meat',
-      subcategory: 'Meat',
-      expirationDate: DateTime.now().add(const Duration(days: 3)),
-      statusColor: Colors.green,
-      icon: Icons.restaurant,
-      iconBackgroundColor: const Color(0xFFE5F5E5),
-      purchaseDate: DateTime.now().subtract(const Duration(days: 2)),
-      quantity: 2,
-      quantityUnit: 'lbs',
-    ),
-    FoodItem(
-      name: 'Broccoli',
-      category: 'Produce',
-      subcategory: 'Produce',
-      expirationDate: DateTime.now().add(const Duration(days: 5)),
-      statusColor: Colors.green,
-      icon: Icons.eco,
-      iconBackgroundColor: const Color(0xFFE5F5E5),
-    ),
-    FoodItem(
-      name: 'Yogurt',
-      category: 'Dairy',
-      subcategory: 'Dairy',
-      expirationDate: DateTime.now().add(const Duration(days: 7)),
-      statusColor: Colors.green,
-      icon: Icons.lunch_dining,
-      iconBackgroundColor: const Color(0xFFE5F5E5),
-    ),
-  ];
+  List<String> get _categories => _foodItemService.getCategories();
 
   List<FoodItem> get _filteredItems {
-    var items = _foodItems;
-
-    // Filter by category
-    if (_selectedCategory != 'All') {
-      if (_selectedCategory == 'Expiring') {
-        items = items.where((item) {
-          final days = item.expirationDate.difference(DateTime.now()).inDays;
-          return days <= 3 && days >= 0;
-        }).toList();
-      } else {
-        items = items
-            .where((item) => item.category == _selectedCategory)
-            .toList();
-      }
-    }
-
-    // Filter by search
-    if (_searchController.text.isNotEmpty) {
-      items = items
-          .where(
-            (item) => item.name.toLowerCase().contains(
-              _searchController.text.toLowerCase(),
-            ),
-          )
-          .toList();
-    }
-
-    return items;
+    return _foodItemService.getFilteredItems(
+      category: _selectedCategory,
+      searchQuery: _searchController.text,
+    );
   }
 
   @override
