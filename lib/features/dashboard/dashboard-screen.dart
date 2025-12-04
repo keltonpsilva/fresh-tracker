@@ -4,9 +4,6 @@ import '../add-item/add-item-screen.dart';
 import '../item-details/item-details-screen.dart';
 import '../../shared/models/food_item.dart';
 import '../../shared/services/food_item_service.dart';
-// -------------------------------
-// Dashboard Page
-// -------------------------------
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -19,14 +16,34 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final FoodItemService _foodItemService = FoodItemService();
   String _selectedCategory = 'All';
   final TextEditingController _searchController = TextEditingController();
+  List<FoodItem> _filteredItems = [];
+  bool _isLoading = true;
 
   List<String> get _categories => _foodItemService.getCategories();
 
-  List<FoodItem> get _filteredItems {
-    return _foodItemService.getFilteredItems(
-      category: _selectedCategory,
-      searchQuery: _searchController.text,
-    );
+  Future<void> _loadItems() async {
+    setState(() => _isLoading = true);
+    try {
+      final items = await _foodItemService.getFilteredItems(
+        category: _selectedCategory,
+        searchQuery: _searchController.text,
+      );
+      setState(() {
+        _filteredItems = items;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _filteredItems = [];
+        _isLoading = false;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadItems();
   }
 
   @override
@@ -88,7 +105,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
               child: TextField(
                 controller: _searchController,
-                onChanged: (_) => setState(() {}),
+                onChanged: (_) => _loadItems(),
                 decoration: InputDecoration(
                   hintText: 'Search for items...',
                   prefixIcon: const Icon(Icons.search, color: Colors.grey),
@@ -125,6 +142,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         setState(() {
                           _selectedCategory = category;
                         });
+                        _loadItems();
                       },
                       selectedColor: const Color(0xFFE5F5E5),
                       backgroundColor: Colors.grey[200],
@@ -150,11 +168,41 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
             // Food Items List
             Expanded(
-              child: _filteredItems.isEmpty
-                  ? const Center(
-                      child: Text(
-                        'No items found',
-                        style: TextStyle(color: Colors.grey),
+              child: _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : _filteredItems.isEmpty
+                  ? Center(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.kitchen,
+                              size: 80,
+                              color: const Color(0xFF2C2C2C),
+                            ),
+                            const SizedBox(height: 24),
+                            const Text(
+                              'Your fridge is empty',
+                              style: TextStyle(
+                                fontSize: 20,
+                                color: Color(0xFF2C2C2C),
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              "Tap the '+' button below to add your first item and start tracking!",
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey[600],
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
                       ),
                     )
                   : ListView.builder(
@@ -170,10 +218,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.of(context).push(
+        onPressed: () async {
+          await Navigator.of(context).push(
             MaterialPageRoute(builder: (context) => const AddItemScreen()),
           );
+          _loadItems(); // Reload items after returning from add screen
         },
         backgroundColor: const Color(0xFF4CAF50),
         child: const Icon(Icons.add, color: Colors.white),

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../shared/models/food_item.dart';
+import '../../shared/services/food_item_service.dart';
+
 class AddItemScreen extends StatefulWidget {
   const AddItemScreen({super.key});
 
@@ -8,9 +11,11 @@ class AddItemScreen extends StatefulWidget {
 }
 
 class _AddItemScreenState extends State<AddItemScreen> {
+  final FoodItemService _foodItemService = FoodItemService();
   final TextEditingController _itemNameController = TextEditingController();
   final TextEditingController _purchaseDateController = TextEditingController();
-  final TextEditingController _expirationDateController = TextEditingController();
+  final TextEditingController _expirationDateController =
+      TextEditingController();
 
   String? _selectedCategory;
   int _quantity = 1;
@@ -63,7 +68,8 @@ class _AddItemScreenState extends State<AddItemScreen> {
   Future<void> _selectExpirationDate() async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: _expirationDate ?? DateTime.now().add(const Duration(days: 7)),
+      initialDate:
+          _expirationDate ?? DateTime.now().add(const Duration(days: 7)),
       firstDate: DateTime.now(),
       lastDate: DateTime.now().add(const Duration(days: 365)),
     );
@@ -90,7 +96,52 @@ class _AddItemScreenState extends State<AddItemScreen> {
     }
   }
 
-  void _addItem() {
+  Color _getStatusColor(DateTime expirationDate) {
+    final days = expirationDate.difference(DateTime.now()).inDays;
+    if (days < 0) return Colors.red;
+    if (days <= 3) return Colors.orange;
+    return Colors.green;
+  }
+
+  IconData _getIconForCategory(String category) {
+    switch (category) {
+      case 'Produce':
+        return Icons.eco;
+      case 'Dairy':
+        return Icons.water_drop;
+      case 'Meat':
+        return Icons.restaurant;
+      case 'Beverages':
+        return Icons.local_drink;
+      case 'Snacks':
+        return Icons.lunch_dining;
+      case 'Frozen':
+        return Icons.ac_unit;
+      default:
+        return Icons.shopping_bag;
+    }
+  }
+
+  Color _getIconBackgroundColor(String category) {
+    switch (category) {
+      case 'Produce':
+        return const Color(0xFFE5F5E5);
+      case 'Dairy':
+        return const Color(0xFFFFF4E5);
+      case 'Meat':
+        return const Color(0xFFFFE5E5);
+      case 'Beverages':
+        return const Color(0xFFE5F0FF);
+      case 'Snacks':
+        return const Color(0xFFFFF9E5);
+      case 'Frozen':
+        return const Color(0xFFE5F5FF);
+      default:
+        return const Color(0xFFF5F5F5);
+    }
+  }
+
+  Future<void> _addItem() async {
     if (_itemNameController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please enter an item name')),
@@ -98,9 +149,9 @@ class _AddItemScreenState extends State<AddItemScreen> {
       return;
     }
     if (_selectedCategory == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a category')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Please select a category')));
       return;
     }
     if (_expirationDate == null) {
@@ -110,11 +161,31 @@ class _AddItemScreenState extends State<AddItemScreen> {
       return;
     }
 
-    // TODO: Add item to fridge
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Item added to fridge!')),
+    final statusColor = _getStatusColor(_expirationDate!);
+    final icon = _getIconForCategory(_selectedCategory!);
+    final iconBackgroundColor = _getIconBackgroundColor(_selectedCategory!);
+
+    final foodItem = FoodItem(
+      name: _itemNameController.text.trim(),
+      category: _selectedCategory!,
+      subcategory: _selectedCategory!,
+      expirationDate: _expirationDate!,
+      statusColor: statusColor,
+      icon: icon,
+      iconBackgroundColor: iconBackgroundColor,
+      purchaseDate: _purchaseDate,
+      quantity: _quantity,
+      quantityUnit: 'unit',
     );
-    Navigator.of(context).pop();
+
+    await _foodItemService.addItem(foodItem);
+
+    if (mounted) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Item added to fridge!')));
+      Navigator.of(context).pop();
+    }
   }
 
   @override
@@ -398,10 +469,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
                   ),
                   child: const Text(
                     'Add Item to Fridge',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                   ),
                 ),
               ),
@@ -412,4 +480,3 @@ class _AddItemScreenState extends State<AddItemScreen> {
     );
   }
 }
-

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../shared/models/food_item.dart';
+import '../../shared/services/food_item_service.dart';
 
 class ItemDetailsScreen extends StatelessWidget {
   final FoodItem item;
@@ -271,14 +272,16 @@ class ItemDetailsScreen extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12.0),
                     child: ElevatedButton(
-                      onPressed: () {
-                        // TODO: Mark as consumed
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Item marked as consumed'),
-                          ),
-                        );
-                        Navigator.of(context).pop();
+                      onPressed: () async {
+                        await FoodItemService().removeItem(item);
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Item marked as consumed'),
+                            ),
+                          );
+                          Navigator.of(context).pop();
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF4CAF50),
@@ -310,7 +313,6 @@ class ItemDetailsScreen extends StatelessWidget {
                   child: IconButton(
                     icon: const Icon(Icons.delete, color: Colors.white),
                     onPressed: () {
-                      // TODO: Delete item
                       showDialog(
                         context: context,
                         builder: (context) => AlertDialog(
@@ -324,12 +326,17 @@ class ItemDetailsScreen extends StatelessWidget {
                               child: const Text('Cancel'),
                             ),
                             TextButton(
-                              onPressed: () {
+                              onPressed: () async {
                                 Navigator.of(context).pop();
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Item deleted')),
-                                );
-                                Navigator.of(context).pop();
+                                await FoodItemService().removeItem(item);
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Item deleted'),
+                                    ),
+                                  );
+                                  Navigator.of(context).pop();
+                                }
                               },
                               child: const Text(
                                 'Delete',
