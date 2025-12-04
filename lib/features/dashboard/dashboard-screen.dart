@@ -234,12 +234,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildFoodItemCard(FoodItem item) {
     return InkWell(
-      onTap: () {
-        Navigator.of(context).push(
+      onTap: () async {
+        await Navigator.of(context).push(
           MaterialPageRoute(
             builder: (context) => ItemDetailsScreen(item: item),
           ),
         );
+        _loadItems(); // Reload items after returning from details screen
       },
       borderRadius: BorderRadius.circular(12),
       child: Container(
