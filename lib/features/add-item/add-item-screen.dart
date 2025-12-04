@@ -1,0 +1,415 @@
+import 'package:flutter/material.dart';
+
+class AddItemScreen extends StatefulWidget {
+  const AddItemScreen({super.key});
+
+  @override
+  State<AddItemScreen> createState() => _AddItemScreenState();
+}
+
+class _AddItemScreenState extends State<AddItemScreen> {
+  final TextEditingController _itemNameController = TextEditingController();
+  final TextEditingController _purchaseDateController = TextEditingController();
+  final TextEditingController _expirationDateController = TextEditingController();
+
+  String? _selectedCategory;
+  int _quantity = 1;
+  DateTime? _purchaseDate;
+  DateTime? _expirationDate;
+
+  @override
+  void initState() {
+    super.initState();
+    // Set purchase date to today by default
+    _purchaseDate = DateTime.now();
+    _purchaseDateController.text =
+        '${_purchaseDate!.month}/${_purchaseDate!.day}/${_purchaseDate!.year}';
+  }
+
+  final List<String> _categories = [
+    'Produce',
+    'Dairy',
+    'Meat',
+    'Beverages',
+    'Snacks',
+    'Frozen',
+    'Other',
+  ];
+
+  @override
+  void dispose() {
+    _itemNameController.dispose();
+    _purchaseDateController.dispose();
+    _expirationDateController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _selectPurchaseDate() async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _purchaseDate ?? DateTime.now(),
+      firstDate: DateTime(2020),
+      lastDate: DateTime.now(),
+    );
+    if (picked != null) {
+      setState(() {
+        _purchaseDate = picked;
+        _purchaseDateController.text =
+            '${picked.month}/${picked.day}/${picked.year}';
+      });
+    }
+  }
+
+  Future<void> _selectExpirationDate() async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _expirationDate ?? DateTime.now().add(const Duration(days: 7)),
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
+    );
+    if (picked != null) {
+      setState(() {
+        _expirationDate = picked;
+        _expirationDateController.text =
+            '${picked.month.toString().padLeft(2, '0')}/${picked.day.toString().padLeft(2, '0')}/${picked.year}';
+      });
+    }
+  }
+
+  void _incrementQuantity() {
+    setState(() {
+      _quantity++;
+    });
+  }
+
+  void _decrementQuantity() {
+    if (_quantity > 1) {
+      setState(() {
+        _quantity--;
+      });
+    }
+  }
+
+  void _addItem() {
+    if (_itemNameController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter an item name')),
+      );
+      return;
+    }
+    if (_selectedCategory == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select a category')),
+      );
+      return;
+    }
+    if (_expirationDate == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select an expiration date')),
+      );
+      return;
+    }
+
+    // TODO: Add item to fridge
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Item added to fridge!')),
+    );
+    Navigator.of(context).pop();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Header
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 12.0,
+              ),
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.close, color: Color(0xFF2C2C2C)),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                  const Expanded(
+                    child: Text(
+                      'Add New Item',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF2C2C2C),
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  const SizedBox(width: 48), // Balance the close button
+                ],
+              ),
+            ),
+
+            // Form Content
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 24),
+
+                    // Item Name
+                    const Text(
+                      'Item Name',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF2C2C2C),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: _itemNameController,
+                      decoration: InputDecoration(
+                        hintText: 'e.g., Milk, Eggs, Chicken Breast',
+                        filled: true,
+                        fillColor: const Color(0xFFF5F5F5),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 16,
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    // Category
+                    const Text(
+                      'Category',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF2C2C2C),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF5F5F5),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: DropdownButtonFormField<String>(
+                        value: _selectedCategory,
+                        decoration: InputDecoration(
+                          hintText: 'Select a category',
+                          filled: true,
+                          fillColor: const Color(0xFFF5F5F5),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 16,
+                          ),
+                          suffixIcon: const Icon(Icons.keyboard_arrow_down),
+                        ),
+                        items: _categories.map((category) {
+                          return DropdownMenuItem<String>(
+                            value: category,
+                            child: Text(category),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedCategory = value;
+                          });
+                        },
+                      ),
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    // Quantity
+                    const Text(
+                      '# Quantity',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF2C2C2C),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF5F5F5),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          // Decrement Button
+                          IconButton(
+                            onPressed: _decrementQuantity,
+                            icon: Container(
+                              width: 32,
+                              height: 32,
+                              decoration: const BoxDecoration(
+                                color: Color(0xFFE0E0E0),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.remove,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                            ),
+                          ),
+
+                          // Quantity Display
+                          Text(
+                            '$_quantity',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF2C2C2C),
+                            ),
+                          ),
+
+                          // Increment Button
+                          IconButton(
+                            onPressed: _incrementQuantity,
+                            icon: Container(
+                              width: 32,
+                              height: 32,
+                              decoration: const BoxDecoration(
+                                color: Color(0xFF4CAF50),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.add,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    // Purchase Date
+                    const Text(
+                      'Purchase Date',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF2C2C2C),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: _purchaseDateController,
+                      readOnly: true,
+                      onTap: _selectPurchaseDate,
+                      decoration: InputDecoration(
+                        hintText: 'mm/dd/yyyy',
+                        filled: true,
+                        fillColor: const Color(0xFFF5F5F5),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 16,
+                        ),
+                        suffixIcon: const Icon(
+                          Icons.calendar_today,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    // Expiration Date
+                    const Text(
+                      'Expiration Date',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF2C2C2C),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: _expirationDateController,
+                      readOnly: true,
+                      onTap: _selectExpirationDate,
+                      decoration: InputDecoration(
+                        hintText: 'mm/dd/yyyy',
+                        filled: true,
+                        fillColor: const Color(0xFFF5F5F5),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 16,
+                        ),
+                        suffixIcon: const Icon(
+                          Icons.calendar_today,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 32),
+                  ],
+                ),
+              ),
+            ),
+
+            // Add Item Button
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: SizedBox(
+                width: double.infinity,
+                height: 56,
+                child: ElevatedButton(
+                  onPressed: _addItem,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF4CAF50),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: const Text(
+                    'Add Item to Fridge',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+

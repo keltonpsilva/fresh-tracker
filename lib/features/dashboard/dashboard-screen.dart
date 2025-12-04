@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import '../add-item/add-item-screen.dart';
 // -------------------------------
 // Dashboard Page
 // -------------------------------
@@ -281,10 +283,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // TODO: Add new item
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(const SnackBar(content: Text('Add new item')));
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (context) => const AddItemScreen()),
+          );
         },
         backgroundColor: const Color(0xFF4CAF50),
         child: const Icon(Icons.add, color: Colors.white),
