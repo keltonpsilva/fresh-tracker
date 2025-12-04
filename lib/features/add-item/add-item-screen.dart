@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../shared/models/food_item.dart';
-import '../../shared/services/food_item_service.dart';
+import '../../shared/services/i_food_item_service.dart';
+import '../../shared/services/food_item_service_factory.dart';
 
 class AddItemScreen extends StatefulWidget {
   const AddItemScreen({super.key});
@@ -11,7 +12,7 @@ class AddItemScreen extends StatefulWidget {
 }
 
 class _AddItemScreenState extends State<AddItemScreen> {
-  final FoodItemService _foodItemService = FoodItemService();
+  final IFoodItemService _foodItemService = FoodItemServiceFactory.getService();
   final TextEditingController _itemNameController = TextEditingController();
   final TextEditingController _purchaseDateController = TextEditingController();
   final TextEditingController _expirationDateController =

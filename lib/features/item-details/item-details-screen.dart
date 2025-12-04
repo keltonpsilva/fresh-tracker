@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 
 import '../../shared/models/food_item.dart';
-import '../../shared/services/food_item_service.dart';
+import '../../shared/services/i_food_item_service.dart';
+import '../../shared/services/food_item_service_factory.dart';
 
 class ItemDetailsScreen extends StatelessWidget {
   final FoodItem item;
+  static final IFoodItemService _foodItemService =
+      FoodItemServiceFactory.getService();
 
   const ItemDetailsScreen({super.key, required this.item});
 
@@ -273,7 +276,7 @@ class ItemDetailsScreen extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 12.0),
                     child: ElevatedButton(
                       onPressed: () async {
-                        await FoodItemService().removeItem(item);
+                        await _foodItemService.removeItem(item);
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
@@ -328,7 +331,7 @@ class ItemDetailsScreen extends StatelessWidget {
                             TextButton(
                               onPressed: () async {
                                 Navigator.of(context).pop();
-                                await FoodItemService().removeItem(item);
+                                await _foodItemService.removeItem(item);
                                 if (context.mounted) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(

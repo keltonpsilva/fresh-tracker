@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../dashboard/dashboard-screen.dart';
-import '../../shared/services/food_item_service.dart';
+import '../../shared/services/food_item_service_factory.dart';
 
 class OnboardingSlide {
   final String title;
@@ -72,9 +72,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
   Future<void> _onImportDemoDataPressed(BuildContext context) async {
     try {
-      final service = FoodItemService();
+      final service = FoodItemServiceFactory.getService();
       await service.importDemoData();
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -205,7 +205,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     onPressed: () => _onImportDemoDataPressed(context),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: const Color(0xFF4CAF50),
-                      side: const BorderSide(color: Color(0xFF4CAF50), width: 2),
+                      side: const BorderSide(
+                        color: Color(0xFF4CAF50),
+                        width: 2,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
