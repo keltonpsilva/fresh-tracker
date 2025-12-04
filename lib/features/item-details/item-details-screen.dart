@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../models/food_item.dart';
+import '../../shared/models/food_item.dart';
 
 class ItemDetailsScreen extends StatelessWidget {
   final FoodItem item;

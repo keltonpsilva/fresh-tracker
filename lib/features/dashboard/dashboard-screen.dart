@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../add-item/add-item-screen.dart';
 import '../item-details/item-details-screen.dart';
-import '../models/food_item.dart';
-import '../services/food_item_service.dart';
+import '../../shared/models/food_item.dart';
+import '../../shared/services/food_item_service.dart';
 // -------------------------------
 // Dashboard Page
 // -------------------------------
