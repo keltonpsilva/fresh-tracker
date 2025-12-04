@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../add-item/add-item-screen.dart';
+import 'item-details-screen.dart';
 // -------------------------------
 // Dashboard Page
 // -------------------------------
@@ -13,6 +14,10 @@ class FoodItem {
   final Color statusColor;
   final IconData icon;
   final Color iconBackgroundColor;
+  final DateTime? purchaseDate;
+  final int? quantity;
+  final String? quantityUnit;
+  final String? notes;
 
   FoodItem({
     required this.name,
@@ -22,6 +27,10 @@ class FoodItem {
     required this.statusColor,
     required this.icon,
     required this.iconBackgroundColor,
+    this.purchaseDate,
+    this.quantity,
+    this.quantityUnit,
+    this.notes,
   });
 
   String get expirationStatus {
@@ -80,6 +89,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
       statusColor: Colors.orange,
       icon: Icons.water_drop,
       iconBackgroundColor: const Color(0xFFFFF4E5),
+      purchaseDate: DateTime.now().subtract(const Duration(days: 6)),
+      quantity: 1,
+      quantityUnit: 'Gallon',
+      notes: 'Opened recently. Keep in the main compartment, not the door.',
     ),
     FoodItem(
       name: 'Chicken Breast',
@@ -89,6 +102,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
       statusColor: Colors.green,
       icon: Icons.restaurant,
       iconBackgroundColor: const Color(0xFFE5F5E5),
+      purchaseDate: DateTime.now().subtract(const Duration(days: 2)),
+      quantity: 2,
+      quantityUnit: 'lbs',
     ),
     FoodItem(
       name: 'Broccoli',
@@ -294,81 +310,91 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildFoodItemCard(FoodItem item) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[200]!),
-      ),
-      child: Row(
-        children: [
-          // Status Color Bar
-          Container(
-            width: 4,
-            height: 80,
-            decoration: BoxDecoration(
-              color: item.statusColor,
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(12),
-                bottomLeft: Radius.circular(12),
-              ),
-            ),
+    return InkWell(
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => ItemDetailsScreen(item: item),
           ),
-
-          // Item Icon
-          Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Container(
-              width: 56,
-              height: 56,
+        );
+      },
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey[200]!),
+        ),
+        child: Row(
+          children: [
+            // Status Color Bar
+            Container(
+              width: 4,
+              height: 80,
               decoration: BoxDecoration(
-                color: item.iconBackgroundColor,
-                borderRadius: BorderRadius.circular(8),
+                color: item.statusColor,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(12),
+                  bottomLeft: Radius.circular(12),
+                ),
               ),
-              child: Icon(item.icon, color: item.statusColor, size: 28),
             ),
-          ),
 
-          // Item Details
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  item.name,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF2C2C2C),
-                  ),
+            // Item Icon
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: item.iconBackgroundColor,
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  item.subcategory,
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  item.expirationStatus,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: item.statusColor,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
+                child: Icon(item.icon, color: item.statusColor, size: 28),
+              ),
             ),
-          ),
 
-          // More options icon
-          IconButton(
-            icon: const Icon(Icons.more_vert, color: Colors.grey),
-            onPressed: () {
-              // TODO: Show item options
-            },
-          ),
-        ],
+            // Item Details
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    item.name,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF2C2C2C),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    item.subcategory,
+                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    item.expirationStatus,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: item.statusColor,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // More options icon
+            IconButton(
+              icon: const Icon(Icons.more_vert, color: Colors.grey),
+              onPressed: () {
+                // TODO: Show item options
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
