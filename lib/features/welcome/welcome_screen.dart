@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../dashboard/dashboard-screen.dart';
+import '../dashboard/dashboard_screen.dart';
 
 import '../../shared/services/food_item_service_factory.dart';
 import '../../shared/services/app_preferences_service.dart';

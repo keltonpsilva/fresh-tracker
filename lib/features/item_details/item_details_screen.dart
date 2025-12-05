@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../shared/models/food_item.dart';
 import '../../shared/services/i_food_item_service.dart';
 import '../../shared/services/food_item_service_factory.dart';
-import '../edit-item/edit-item-screen.dart';
+import '../edit_item/edit_item_screen.dart';
 
 class ItemDetailsScreen extends StatelessWidget {
   final FoodItem item;
