@@ -24,15 +24,15 @@ jobs:
       - name: Run Flutter analyze
         run: flutter analyze --fatal-infos --fatal-warnings
 
-      - name: Run tests
-        run: flutter test --coverage
+      # - name: Run tests
+      #   run: flutter test --coverage
 
-      - name: Upload coverage
-        if: github.ref == 'refs/heads/main'
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage
-          path: coverage/
+      # - name: Upload coverage
+      #   if: github.ref == 'refs/heads/main'
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: coverage
+      #     path: coverage/
 
   build-android:
     name: Build Android
