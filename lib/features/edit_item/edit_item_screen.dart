@@ -295,7 +295,7 @@ class _EditItemScreenState extends State<EditItemScreen> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: DropdownButtonFormField<String>(
-                        value: _selectedCategory,
+                        initialValue: _selectedCategory,
                         decoration: InputDecoration(
                           hintText: 'Select a category',
                           filled: true,
