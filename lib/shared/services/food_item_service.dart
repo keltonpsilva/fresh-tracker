@@ -173,6 +173,7 @@ class FoodItemService implements IFoodItemService {
   }
 
   // Get all food items
+  @override
   Future<List<FoodItem>> getAllItems() async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(_tableName);
@@ -180,6 +181,7 @@ class FoodItemService implements IFoodItemService {
   }
 
   // Get filtered items by category and search query
+  @override
   Future<List<FoodItem>> getFilteredItems({
     String? category,
     String? searchQuery,
@@ -226,17 +228,20 @@ class FoodItemService implements IFoodItemService {
   }
 
   // Get available categories
+  @override
   List<String> getCategories() {
     return ['All', 'Produce', 'Dairy', 'Meat', 'Expiring'];
   }
 
   // Add a new food item
+  @override
   Future<int> addItem(FoodItem item) async {
     final db = await database;
     return await db.insert(_tableName, _foodItemToMap(item));
   }
 
   // Remove a food item
+  @override
   Future<int> removeItem(FoodItem item) async {
     final db = await database;
     // We need to find the item by its properties since we don't have an ID
@@ -265,6 +270,7 @@ class FoodItemService implements IFoodItemService {
   }
 
   // Update a food item
+  @override
   Future<int> updateItem(FoodItem oldItem, FoodItem newItem) async {
     final db = await database;
     // Find the old item by its properties
@@ -284,6 +290,7 @@ class FoodItemService implements IFoodItemService {
   }
 
   // Import demo data into the database
+  @override
   Future<void> importDemoData() async {
     final db = await database;
     for (final item in _demoFoodItems) {
