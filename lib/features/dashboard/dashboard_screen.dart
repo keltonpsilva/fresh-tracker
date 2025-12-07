@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../add_item/add_item_screen.dart';
 import '../item_details/item_details_screen.dart';
+import '../barcode_scanner/barcode_scanner_screen.dart';
 import '../../shared/models/food_item.dart';
 import '../../shared/services/i_food_item_service.dart';
 import '../../shared/services/food_item_service_factory.dart';
@@ -88,12 +89,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 const SizedBox(height: 24),
                 // Scan Barcode Option
                 InkWell(
-                  onTap: () {
+                  onTap: () async {
                     Navigator.of(context).pop();
-                    // TODO: Implement barcode scanner
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Barcode scanner coming soon!'),
+                    await Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const BarcodeScannerScreen(),
                       ),
                     );
                   },
