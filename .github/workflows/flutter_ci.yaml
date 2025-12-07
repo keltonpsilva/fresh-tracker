@@ -109,7 +109,7 @@ jobs:
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: android-${{ env.APPLICATION_NAME }}-${{ needs.generate-versioning.outputs.version}}
+          name: android-${{ env.APPLICATION_NAME }}-${{ needs.generate-versioning.outputs.version }}
           path: build/app/outputs/flutter-apk/app-release.apk
 
   # -------------------------------------------
@@ -149,7 +149,7 @@ jobs:
       - name: Upload Web Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: web-${{ env.APPLICATION_NAME }}-${{ needs.generate-versioning.outputs.version}}
+          name: web-${{ env.APPLICATION_NAME }}-${{ needs.generate-versioning.outputs.version }}
           path: build/web
 
   # -------------------------------------------
@@ -162,6 +162,7 @@ jobs:
     needs:
       - build-web
       - build-android
+      - generate-versioning
 
     if: startsWith(github.ref, 'refs/heads/main') || startsWith(github.ref, 'refs/heads/release/')
 
@@ -169,32 +170,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Get Version
-        id: version
-        run: |
-          VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}')
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-
       - name: Compute Tag
         id: tag
         run: |
           if [[ "${GITHUB_REF}" == "refs/heads/main" ]]; then
-            TAG="v${{ steps.version.outputs.version }}-rc"
+            TAG="v${{ needs.generate-versioning.outputs.version }}-rc"
           else
-            TAG="v${{ steps.version.outputs.version }}"
+            TAG="v${{ needs.generate-versioning.outputs.version }}"
           fi
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
 
       - name: Download APK
         uses: actions/download-artifact@v4
         with:
-          name: android-${{ env.APPLICATION_NAME }}-${{ steps.version.outputs.version }}
+          name: android-${{ env.APPLICATION_NAME }}-${{ needs.generate-versioning.outputs.version }}
           path: dist/
 
       - name: Download Web
         uses: actions/download-artifact@v4
         with:
-          name: web-${{ env.APPLICATION_NAME }}-${{ steps.version.outputs.version }}
+          name: web-${{ env.APPLICATION_NAME }}-${{ needs.generate-versioning.outputs.version }}
           path: dist/
 
       - name: Create GitHub Release
@@ -204,7 +199,7 @@ jobs:
           name: ${{ steps.tag.outputs.tag }}
           prerelease: ${{ github.ref == 'refs/heads/main' }}
           files: |
-            web-${{ env.APPLICATION_NAME }}-${{ steps.version.outputs.version }}
-            android-${{ env.APPLICATION_NAME }}-${{ steps.version.outputs.version }}
+            web-${{ env.APPLICATION_NAME }}-${{ needs.generate-versioning.outputs.version }}
+            android-${{ env.APPLICATION_NAME }}-${{ needs.generate-versioning.outputs.version }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
