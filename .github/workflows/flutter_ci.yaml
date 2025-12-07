@@ -50,4 +50,4 @@ jobs:
     needs: generate-versioning
     uses: ./.github/workflows/create-tag.yaml
     with:
-      new_version: ${{ needs.generate-versioning.outputs.version-number }}
+      new_version: ${{ needs.generate-versioning.outputs.version }}
