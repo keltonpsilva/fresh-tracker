@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../add-item/add-item-screen.dart';
-import '../item-details/item-details-screen.dart';
+import '../add_item/add_item_screen.dart';
+import '../item_details/item_details_screen.dart';
 import '../../shared/models/food_item.dart';
 import '../../shared/services/i_food_item_service.dart';
 import '../../shared/services/food_item_service_factory.dart';

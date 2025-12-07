@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:sqflite/sqflite.dart';
-
 import 'package:flutter/foundation.dart' show kIsWeb;
-
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
-import 'features/welcome/wellcome-screen.dart';
-import 'features/dashboard/dashboard-screen.dart';
+import 'features/welcome/welcome_screen.dart';
+import 'features/dashboard/dashboard_screen.dart';
 import 'shared/services/app_preferences_service.dart';
 
 void main() async {

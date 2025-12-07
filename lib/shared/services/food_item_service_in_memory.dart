@@ -79,11 +79,13 @@ class FoodItemServiceInMemory implements IFoodItemService {
   ];
 
   // Get all food items
+  @override
   Future<List<FoodItem>> getAllItems() async {
     return List.from(_items);
   }
 
   // Get filtered items by category and search query
+  @override
   Future<List<FoodItem>> getFilteredItems({
     String? category,
     String? searchQuery,
@@ -120,17 +122,20 @@ class FoodItemServiceInMemory implements IFoodItemService {
   }
 
   // Get available categories
+  @override
   List<String> getCategories() {
     return ['All', 'Produce', 'Dairy', 'Meat', 'Expiring'];
   }
 
   // Add a new food item
+  @override
   Future<int> addItem(FoodItem item) async {
     _items.add(item);
     return _nextId++;
   }
 
   // Remove a food item
+  @override
   Future<int> removeItem(FoodItem item) async {
     final index = _items.indexWhere(
       (existingItem) => _itemsEqual(existingItem, item),
@@ -152,6 +157,7 @@ class FoodItemServiceInMemory implements IFoodItemService {
   }
 
   // Update a food item
+  @override
   Future<int> updateItem(FoodItem oldItem, FoodItem newItem) async {
     final index = _items.indexWhere(
       (existingItem) => _itemsEqual(existingItem, oldItem),
@@ -164,6 +170,7 @@ class FoodItemServiceInMemory implements IFoodItemService {
   }
 
   // Import demo data
+  @override
   Future<void> importDemoData() async {
     _items.clear();
     _items.addAll(_demoFoodItems);

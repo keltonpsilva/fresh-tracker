@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../shared/models/food_item.dart';
 import '../../shared/services/i_food_item_service.dart';
 import '../../shared/services/food_item_service_factory.dart';
-import '../edit-item/edit-item-screen.dart';
+import '../edit_item/edit_item_screen.dart';
 
 class ItemDetailsScreen extends StatelessWidget {
   final FoodItem item;
@@ -98,7 +98,7 @@ class ItemDetailsScreen extends StatelessWidget {
                       child: Icon(
                         item.icon,
                         size: 100,
-                        color: Colors.white.withOpacity(0.9),
+                        color: Colors.white.withValues(alpha: 0.9),
                       ),
                     ),
                   ),
@@ -236,7 +236,7 @@ class ItemDetailsScreen extends StatelessWidget {
               color: Colors.white,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, -2),
                 ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../dashboard/dashboard-screen.dart';
+import '../dashboard/dashboard_screen.dart';
 
 import '../../shared/services/food_item_service_factory.dart';
 import '../../shared/services/app_preferences_service.dart';
@@ -54,15 +54,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
-    } else {
-      // On last slide, proceed to main app
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Welcome! Let\'s get started!'),
-          duration: Duration(seconds: 2),
-        ),
-      );
-      // TODO: Navigate to main app screen
     }
   }
 
@@ -82,25 +73,24 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       final service = FoodItemServiceFactory.getService();
       await service.importDemoData();
 
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Demo data imported successfully!'),
-            duration: Duration(seconds: 2),
-            backgroundColor: Color(0xFF4CAF50),
-          ),
-        );
-      }
+      if (!context.mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Demo data imported successfully!'),
+          duration: Duration(seconds: 2),
+          backgroundColor: Color(0xFF4CAF50),
+        ),
+      );
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error importing demo data: $e'),
-            duration: const Duration(seconds: 2),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error importing demo data: $e'),
+          duration: const Duration(seconds: 2),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -329,7 +319,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     child: Container(
                       height: 30,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFE0E0E0).withOpacity(0.6),
+                        color: const Color(0xFFE0E0E0).withValues(alpha: 0.6),
                         borderRadius: BorderRadius.circular(4),
                         border: Border.all(color: const Color(0xFF9E9E9E)),
                       ),
@@ -342,7 +332,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     child: Container(
                       height: 30,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFE0E0E0).withOpacity(0.6),
+                        color: const Color(0xFFE0E0E0).withValues(alpha: 0.6),
                         borderRadius: BorderRadius.circular(4),
                         border: Border.all(color: const Color(0xFF9E9E9E)),
                       ),
@@ -381,7 +371,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       decoration: BoxDecoration(
         color: isActive
             ? const Color(0xFF4CAF50)
-            : const Color(0xFF4CAF50).withOpacity(0.3),
+            : const Color(0xFF4CAF50).withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(12),
       ),
     );
