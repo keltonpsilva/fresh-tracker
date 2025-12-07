@@ -188,13 +188,13 @@ jobs:
       - name: Download APK
         uses: actions/download-artifact@v4
         with:
-          name: android-${{ env.APPLICATION_NAME }}-${{ needs.generate-versioning.outputs.version}}
+          name: android-${{ env.APPLICATION_NAME }}-${{ steps.version.outputs.version }}
           path: dist/
 
       - name: Download Web
         uses: actions/download-artifact@v4
         with:
-          name: web-${{ env.APPLICATION_NAME }}-${{ needs.generate-versioning.outputs.version}}
+          name: web-${{ env.APPLICATION_NAME }}-${{ steps.version.outputs.version }}
           path: dist/
 
       - name: Create GitHub Release
@@ -204,7 +204,7 @@ jobs:
           name: ${{ steps.tag.outputs.tag }}
           prerelease: ${{ github.ref == 'refs/heads/main' }}
           files: |
-            web-${{ env.APPLICATION_NAME }}-${{ needs.generate-versioning.outputs.version}}
-            android-${{ env.APPLICATION_NAME }}-${{ needs.generate-versioning.outputs.version}}
+            web-${{ env.APPLICATION_NAME }}-${{ steps.version.outputs.version }}
+            android-${{ env.APPLICATION_NAME }}-${{ steps.version.outputs.version }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
