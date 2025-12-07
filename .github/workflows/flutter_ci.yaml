@@ -104,16 +104,27 @@ jobs:
       - name: Build APK
         run: flutter build apk --release
 
+      # 🔥 NEW: rename the APK file based on app name + version
+      - name: Rename APK with Version
+        id: rename
+        run: |
+          APP_NAME=$(grep '^name:' pubspec.yaml | awk '{print $2}')
+          VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}')
+          NEW_NAME="${APP_NAME}-${VERSION}.apk"
+
+          mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/$NEW_NAME
+
+          echo "apk_path=build/app/outputs/flutter-apk/$NEW_NAME" >> "$GITHUB_OUTPUT"
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: android-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
+          path: ${{ steps.rename.outputs.apk_path }}
 
   # -------------------------------------------
   # 4. BUILD WEB
   # -------------------------------------------
-
   build-web:
     name: Build Web
     runs-on: ubuntu-latest
@@ -144,13 +155,27 @@ jobs:
       - name: Build Web
         run: flutter build web --release --no-tree-shake-icons
 
-      - name: Upload Web
+      # 🔥 NEW: package & rename web artifact
+      - name: Package and Rename Web Build
+        id: rename
+        run: |
+          APP_NAME=$(grep '^name:' pubspec.yaml | awk '{print $2}')
+          VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}')
+          ZIP_NAME="${APP_NAME}-${VERSION}.zip"
+
+          cd build/web
+          zip -r "../$ZIP_NAME" .
+          cd ../
+
+          echo "zip_path=build/$ZIP_NAME" >> "$GITHUB_OUTPUT"
+
+      - name: Upload Web Artifact
         uses: actions/upload-artifact@v4
         with:
           name: web-release
-          path: build/web
+          path: ${{ steps.rename.outputs.zip_path }}
 
-  # -------------------------------------------
+    # -------------------------------------------
   # 5. CREATE RELEASE / RC
   # -------------------------------------------
 
