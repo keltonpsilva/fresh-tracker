@@ -24,20 +24,6 @@ jobs:
           persist-credentials: true
           fetch-depth: 0
 
-      - name: Update pubspec.yaml
-        run: |
-          NEW_VERSION="${{ inputs.new_version }}"
-          sed -i "s/^version: .*/version: $NEW_VERSION/" pubspec.yaml
-          echo "Updated pubspec.yaml to version: $NEW_VERSION"
-
-      # - name: Commit and push version update
-      #   run: |
-      #     git config --local user.email "${{ github.actor }}@users.noreply.github.com"
-      #     git config --local user.name "${{ github.actor }}"
-      #     git add pubspec.yaml
-      #     git diff --staged --quiet || git commit -m "chore: bump version to ${{ inputs.new_version }}"
-      #     git push
-
       - name: Create tag
         uses: actions/github-script@v8
         with:
@@ -49,3 +35,27 @@ jobs:
               ref: 'refs/tags/${{ inputs.new_version }}',
               sha: context.sha
             })
+
+      # - name: Download APK
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: android-${{ env.APPLICATION_NAME }}-${{ needs.generate-versioning.outputs.version }}
+      #     path: dist/
+
+      # - name: Download Web
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: web-${{ env.APPLICATION_NAME }}-${{ needs.generate-versioning.outputs.version }}
+      #     path: dist/
+
+      # - name: Create GitHub Release
+      #   uses: softprops/action-gh-release@v2
+      #   with:
+      #     tag_name: ${{ inputs.new_version }}
+      #     name: ${{ inputs.new_version }}
+      #     prerelease: ${{ github.ref == 'refs/heads/main' }}
+      #     # files: |
+      #       # web-${{ env.APPLICATION_NAME }}-${{ needs.generate-versioning.outputs.version }}
+      #       # android-${{ env.APPLICATION_NAME }}-${{ needs.generate-versioning.outputs.version }}
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
