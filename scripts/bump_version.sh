@@ -13,3 +13,6 @@ sed -i "s/^version: .*/version: $FULL_VERSION/" pubspec.yaml
 
 echo "Updated version to $FULL_VERSION"
 echo $VERSION > version.txt
+
+# Output version for GitHub Actions
+echo "version=$FULL_VERSION" >> "$GITHUB_OUTPUT"
