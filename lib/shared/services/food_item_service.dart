@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sqflite/sqflite.dart';
@@ -9,15 +8,28 @@ import 'package:path_provider/path_provider.dart';
 import '../models/food_item.dart';
 import 'i_food_item_service.dart';
 
+/// ------------------------------------------------------------
+/// ICON LOOKUP TABLE (tree-shake safe)
+/// ------------------------------------------------------------
+/// These values must match the icons you save.
+/// You can print icon.codePoint to confirm each one.
+const Map<int, IconData> kIconLookup = {
+  // Demo data icons
+  0xeac0: Icons.egg, // Icons.egg.codePoint
+  0xf054b: Icons.water_drop, // Icons.water_drop.codePoint
+  0xe56c: Icons.restaurant, // Icons.restaurant.codePoint
+  0xe63a: Icons.eco, // Icons.eco.codePoint
+  0xf109f: Icons.lunch_dining, // Icons.lunch_dining.codePoint
+};
+
 class FoodItemService implements IFoodItemService {
   static final FoodItemService _instance = FoodItemService._internal();
   factory FoodItemService() => _instance;
   FoodItemService._internal();
 
-  // static Database? _database;
   static const String _tableName = 'food_items';
 
-  // Demo food items for seeding the database
+  /// Demo items
   static final List<FoodItem> _demoFoodItems = [
     FoodItem(
       name: 'Organic Eggs',
@@ -86,29 +98,25 @@ class FoodItemService implements IFoodItemService {
 
   Future<Database> get database async {
     if (_database != null) return _database!;
-    _database = await _initDatabase(importDemo: true); // or false if you want
+    _database = await _initDatabase(importDemo: true);
     return _database!;
   }
 
   Future<Database> _initDatabase({bool importDemo = false}) async {
-    // 1. Get safe documents directory
     final documentsDir = await getApplicationDocumentsDirectory();
     await Directory(documentsDir.path).create(recursive: true);
     final dbPath = join(documentsDir.path, 'food_items.db');
 
-    // 2. Copy demo DB from assets if requested
     if (importDemo && !await File(dbPath).exists()) {
       final data = await rootBundle.load('assets/food_items.db');
       final bytes = data.buffer.asUint8List();
       await File(dbPath).writeAsBytes(bytes, flush: true);
     }
 
-    // 3. Open the database
     return await openDatabase(
       dbPath,
       version: 1,
       onCreate: (db, version) async {
-        // Only called if database is new
         await db.execute('''
         CREATE TABLE $_tableName (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -145,7 +153,12 @@ class FoodItemService implements IFoodItemService {
     };
   }
 
+  /// -------------------------
+  /// FIXED: NO dynamic IconData
+  /// -------------------------
   FoodItem _mapToFoodItem(Map<String, dynamic> map) {
+    final iconCode = map['icon_code_point'] as int;
+
     return FoodItem(
       name: map['name'] as String,
       category: map['category'] as String,
@@ -154,33 +167,31 @@ class FoodItemService implements IFoodItemService {
         map['expiration_date'] as int,
       ),
       statusColor: Color(map['status_color'] as int),
-      icon: IconData(
-        map['icon_code_point'] as int,
-        fontFamily: 'MaterialIcons',
-      ),
+
+      /// SAFE icon lookup
+      icon: kIconLookup[iconCode] ?? Icons.help_outline,
+
       iconBackgroundColor: Color(map['icon_background_color'] as int),
+
       purchaseDate: map['purchase_date'] != null
           ? DateTime.fromMillisecondsSinceEpoch(map['purchase_date'] as int)
           : DateTime.fromMillisecondsSinceEpoch(
               map['expiration_date'] as int,
             ).subtract(const Duration(days: 7)),
-      quantity: map['quantity'] != null ? map['quantity'] as int : 1,
-      quantityUnit: map['quantity_unit'] != null
-          ? map['quantity_unit'] as String
-          : 'unit',
+
+      quantity: map['quantity'] ?? 1,
+      quantityUnit: map['quantity_unit'] ?? 'unit',
       notes: map['notes'] as String?,
     );
   }
 
-  // Get all food items
   @override
   Future<List<FoodItem>> getAllItems() async {
     final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query(_tableName);
+    final maps = await db.query(_tableName);
     return List.generate(maps.length, (i) => _mapToFoodItem(maps[i]));
   }
 
-  // Get filtered items by category and search query
   @override
   Future<List<FoodItem>> getFilteredItems({
     String? category,
@@ -214,7 +225,6 @@ class FoodItemService implements IFoodItemService {
 
     var items = List.generate(maps.length, (i) => _mapToFoodItem(maps[i]));
 
-    // Filter by search query
     if (searchQuery != null && searchQuery.isNotEmpty) {
       items = items
           .where(
@@ -227,26 +237,22 @@ class FoodItemService implements IFoodItemService {
     return items;
   }
 
-  // Get available categories
   @override
   List<String> getCategories() {
     return ['All', 'Produce', 'Dairy', 'Meat', 'Expiring'];
   }
 
-  // Add a new food item
   @override
   Future<int> addItem(FoodItem item) async {
     final db = await database;
     return await db.insert(_tableName, _foodItemToMap(item));
   }
 
-  // Remove a food item
   @override
   Future<int> removeItem(FoodItem item) async {
     final db = await database;
-    // We need to find the item by its properties since we don't have an ID
-    // This is a limitation - ideally FoodItem should have an ID field
     final maps = await db.query(_tableName);
+
     for (final map in maps) {
       final existingItem = _mapToFoodItem(map);
       if (_itemsEqual(existingItem, item)) {
@@ -260,7 +266,6 @@ class FoodItemService implements IFoodItemService {
     return 0;
   }
 
-  // Helper method to compare FoodItems
   bool _itemsEqual(FoodItem a, FoodItem b) {
     return a.name == b.name &&
         a.category == b.category &&
@@ -269,12 +274,11 @@ class FoodItemService implements IFoodItemService {
             b.expirationDate.millisecondsSinceEpoch;
   }
 
-  // Update a food item
   @override
   Future<int> updateItem(FoodItem oldItem, FoodItem newItem) async {
     final db = await database;
-    // Find the old item by its properties
     final maps = await db.query(_tableName);
+
     for (final map in maps) {
       final existingItem = _mapToFoodItem(map);
       if (_itemsEqual(existingItem, oldItem)) {
@@ -289,7 +293,6 @@ class FoodItemService implements IFoodItemService {
     return 0;
   }
 
-  // Import demo data into the database
   @override
   Future<void> importDemoData() async {
     final db = await database;
