@@ -108,7 +108,7 @@ jobs:
   # -------------------------------------------
 
   generate-versioning:
-    needs: [analyze-and-test]
+    needs: [build-android, build-web]
     uses: ./.github/workflows/generate-versioning.yaml
     if: github.event_name == 'push' && ((github.ref == 'refs/heads/main') || startsWith(github.ref_name, 'release'))
 
@@ -144,9 +144,8 @@ jobs:
   # -------------------------------------------
 
   create-release:
-    name: Create Release
     runs-on: ubuntu-latest
-    needs: [build-web, build-android, generate-versioning, create-tag]
+    needs: [generate-versioning, create-tag]
 
     steps:
       - name: Checkout
