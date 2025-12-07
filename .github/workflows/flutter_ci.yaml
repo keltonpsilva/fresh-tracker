@@ -38,6 +38,7 @@ jobs:
   # -------------------------------------------
 
   generate-versioning:
+    needs: [analyze-and-test]
     uses: ./.github/workflows/generate-versioning.yaml
     if: github.event_name == 'push' && ((github.ref == 'refs/heads/main') || startsWith(github.ref_name, 'release'))
 
