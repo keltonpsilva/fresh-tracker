@@ -1,6 +1,9 @@
 on:
   push:
 
+env:
+  APPLICATION_NAME: fresh_tack
+
 # -------------------------------------------
 # 1. ANALYZE & TEST
 # -------------------------------------------
@@ -106,7 +109,7 @@ jobs:
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: android-apk
+          name: android-${{ env.APPLICATION_NAME }}-${{ needs.generate-versioning.outputs.version}}
           path: build/app/outputs/flutter-apk/app-release.apk
 
   # -------------------------------------------
@@ -146,72 +149,8 @@ jobs:
       - name: Upload Web Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: web-release
+          name: web-${{ env.APPLICATION_NAME }}-${{ needs.generate-versioning.outputs.version}}
           path: build/web
-
-  # -------------------------------------------
-  # 5. RENAME ARTIFACTS (centralized renaming)
-  # -------------------------------------------
-
-  rename-artifacts:
-    name: Rename All Artifacts
-    runs-on: ubuntu-latest
-    needs:
-      - build-android
-      - build-web
-      - generate-versioning
-
-    outputs:
-      apk: ${{ steps.out.outputs.apk }}
-      web: ${{ steps.out.outputs.web }}
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Download Android APK
-        uses: actions/download-artifact@v4
-        with:
-          name: android-apk
-          path: artifacts/
-
-      - name: Download Web Build
-        uses: actions/download-artifact@v4
-        with:
-          name: web-release
-          path: artifacts/web/
-
-      - name: Rename Artifacts
-        id: rename
-        run: |
-          APP_NAME=$(grep '^name:' pubspec.yaml | awk '{print $2}')
-          VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}')
-
-          APK_ORIG=$(ls artifacts/*.apk | head -n 1)
-          WEB_DIR=artifacts/web
-          WEB_NEW="artifacts/${APP_NAME}-${VERSION}.zip"
-
-          # Zip web build
-          cd $WEB_DIR
-          zip -r "../${APP_NAME}-${VERSION}.zip" .
-          cd ../
-
-          mv "$APK_ORIG" "artifacts/${APP_NAME}-${VERSION}.apk"
-
-          echo "apk=artifacts/${APP_NAME}-${VERSION}.apk" >> "$GITHUB_OUTPUT"
-          echo "web=$WEB_NEW" >> "$GITHUB_OUTPUT"
-
-      - name: Upload Renamed Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: release-artifacts
-          path: artifacts/
-
-      - name: Outputs
-        id: out
-        run: |
-          echo "apk=${{ steps.rename.outputs.apk }}" >> "$GITHUB_OUTPUT"
-          echo "web=${{ steps.rename.outputs.web }}" >> "$GITHUB_OUTPUT"
 
   # -------------------------------------------
   # 6. CREATE RELEASE / RC
@@ -221,7 +160,6 @@ jobs:
     name: Create Release / Release Candidate
     runs-on: ubuntu-latest
     needs:
-      - rename-artifacts
       - generate-versioning
 
     if: startsWith(github.ref, 'refs/heads/main') || startsWith(github.ref, 'refs/heads/release/')
@@ -246,10 +184,16 @@ jobs:
           fi
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
 
-      - name: Download Renamed Artifacts
+      - name: Download APK
         uses: actions/download-artifact@v4
         with:
-          name: release-artifacts
+          name: android-${{ env.APPLICATION_NAME }}-${{ needs.generate-versioning.outputs.version}}
+          path: dist/
+
+      - name: Download Web
+        uses: actions/download-artifact@v4
+        with:
+          name: web-${{ env.APPLICATION_NAME }}-${{ needs.generate-versioning.outputs.version}}
           path: dist/
 
       - name: Create GitHub Release
@@ -258,6 +202,8 @@ jobs:
           tag_name: ${{ steps.tag.outputs.tag }}
           name: ${{ steps.tag.outputs.tag }}
           prerelease: ${{ github.ref == 'refs/heads/main' }}
-          files: dist/**
+          files: |
+            web-${{ env.APPLICATION_NAME }}-${{ needs.generate-versioning.outputs.version}}
+            android-${{ env.APPLICATION_NAME }}-${{ needs.generate-versioning.outputs.version}}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
