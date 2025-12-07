@@ -22,6 +22,7 @@ class WelcomeScreen extends StatefulWidget {
 class _WelcomeScreenState extends State<WelcomeScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
+  bool _hasImportedDemoData = false;
 
   final List<OnboardingSlide> _slides = const [
     OnboardingSlide(
@@ -69,11 +70,17 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   }
 
   Future<void> _onImportDemoDataPressed(BuildContext context) async {
+    if (_hasImportedDemoData) return;
+
     try {
       final service = FoodItemServiceFactory.getService();
       await service.importDemoData();
 
       if (!context.mounted) return;
+
+      setState(() {
+        _hasImportedDemoData = true;
+      });
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -201,20 +208,25 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   width: double.infinity,
                   height: 56,
                   child: OutlinedButton(
-                    onPressed: () => _onImportDemoDataPressed(context),
+                    onPressed: _hasImportedDemoData
+                        ? null
+                        : () => _onImportDemoDataPressed(context),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFF4CAF50),
-                      side: const BorderSide(
-                        color: Color(0xFF4CAF50),
+                      foregroundColor: _hasImportedDemoData
+                          ? Colors.grey
+                          : const Color(0xFF4CAF50),
+                      side: BorderSide(
+                        color: _hasImportedDemoData
+                            ? Colors.grey
+                            : const Color(0xFF4CAF50),
                         width: 2,
                       ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: const Text(
-                      'Import Demo Data',
-                      style: TextStyle(
+                    child: Text('Import Demo Data',
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
                       ),
