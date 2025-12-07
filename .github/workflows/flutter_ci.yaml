@@ -47,7 +47,6 @@ jobs:
   # -------------------------------------------
 
   create-tag:
-    name: Release Versioning
     needs: generate-versioning
     uses: ./.github/workflows/create-tag.yaml
     with:

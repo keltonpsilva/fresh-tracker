@@ -53,12 +53,12 @@ jobs:
             export VERSION="$MAJOR_MINOR.$PATCH"
           else
             # Generate Pre tag version
-            if [[ "$TAG" == *-pre-* ]]; then
+            if [[ "$TAG" == *-rc-* ]]; then
               # Increase Build Number
               echo "Pre tag found only increase build number by 1"
 
               NEXT_PATCH=$PATCH
-              PREVIOUS_BUILDNUMBER=$(echo "$TAG" | awk -F'-pre-' '{print $2}' | tr -d '[:alpha:]')
+              PREVIOUS_BUILDNUMBER=$(echo "$TAG" | awk -F'-rc-' '{print $2}' | tr -d '[:alpha:]')
               BUILDNUMBER=$((PREVIOUS_BUILDNUMBER + 1))
             else
               # Increase Path Number and Set Build number 1
@@ -67,7 +67,7 @@ jobs:
               NEXT_PATCH=$((PATCH + 1))
               BUILDNUMBER=1
             fi
-            export VERSION="$MAJOR_MINOR.$NEXT_PATCH-pre-$BUILDNUMBER"
+            export VERSION="$MAJOR_MINOR.$NEXT_PATCH-rc-$BUILDNUMBER"
           fi
 
           echo "Setting version to $VERSION"
