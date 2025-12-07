@@ -160,7 +160,8 @@ jobs:
     name: Create Release / Release Candidate
     runs-on: ubuntu-latest
     needs:
-      - generate-versioning
+      - build-web
+      - build-android
 
     if: startsWith(github.ref, 'refs/heads/main') || startsWith(github.ref, 'refs/heads/release/')
 
