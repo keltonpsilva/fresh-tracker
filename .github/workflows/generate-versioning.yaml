@@ -1,0 +1,75 @@
+name: Generate Versioning
+
+on:
+  workflow_call:
+    outputs:
+      version:
+        description: "The full version number including 'v' prefix to use for the application"
+        value: ${{ jobs.generate-versioning.outputs.VERSION }}
+      version-number:
+        description: "The version number without the 'v' prefix to use for the application"
+        value: ${{ jobs.generate-versioning.outputs.VERSION_NUMBER }}
+
+jobs:
+  generate-versioning:
+    name: Generate Versioning
+    runs-on: ubuntu-latest
+    outputs:
+      VERSION: ${{ steps.generate-tag-version.outputs.VERSION }}
+      VERSION_NUMBER: ${{ steps.generate-tag-version.outputs.VERSION_NUMBER }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get latest tag and calculate next version
+        id: generate-tag-version
+        run: |
+          # Fetch all tags
+          git fetch --tags
+
+          DEFAULT_TAG=1.0.0
+          LAST_TAG=$(git describe --tags --abbrev=0)
+
+          # If LAST_TAG is empty, set TAG to DEFAULT_TAG
+          if [ -z "$LAST_TAG" ]; then
+            TAG=$DEFAULT_TAG
+          else
+            TAG=$LAST_TAG
+          fi
+
+          # Compare the tags and set TAG to DEFAULT_TAG if LAST_TAG is lower
+          if [ "$(printf '%s\n' "$DEFAULT_TAG" "$TAG" | sort -V | head -n 1)" = "$TAG" ] && [ "$TAG" != "$DEFAULT_TAG" ]; then
+            TAG=$DEFAULT_TAG
+          fi
+
+          MAJOR_MINOR=$(echo "$TAG" | awk -F'.' '{print $1"."$2}')
+          PATCH=$(echo "$TAG" | awk -F'.' '{print $3}' | awk -F'-' '{print $1}' | tr -d '[:alpha:]')
+
+          # Check if GITHUB_REF contains 'release' 
+          if [[ "$GITHUB_REF" == *release* ]]; then
+            export VERSION="$MAJOR_MINOR.$PATCH"
+          else
+            # Generate Pre tag version
+            if [[ "$TAG" == *-rc-* ]]; then
+              # Increase Build Number
+              echo "Pre tag found only increase build number by 1"
+
+              NEXT_PATCH=$PATCH
+              PREVIOUS_BUILDNUMBER=$(echo "$TAG" | awk -F'-rc-' '{print $2}' | tr -d '[:alpha:]')
+              BUILDNUMBER=$((PREVIOUS_BUILDNUMBER + 1))
+            else
+              # Increase Path Number and Set Build number 1
+              echo "Pre tag not found create new pre tag"
+
+              NEXT_PATCH=$((PATCH + 1))
+              BUILDNUMBER=1
+            fi
+            export VERSION="$MAJOR_MINOR.$NEXT_PATCH-rc-$BUILDNUMBER"
+          fi
+
+          echo "Setting version to $VERSION"
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "VERSION_NUMBER=${VERSION:1}" >> $GITHUB_OUTPUT
