@@ -1,3 +1,5 @@
+[![Codemagic build status](https://api.codemagic.io/apps/6934eea0ca9bdb997fbfb5d0/6934eea0ca9bdb997fbfb5cf/status_badge.svg)](https://codemagic.io/app/6934eea0ca9bdb997fbfb5d0/6934eea0ca9bdb997fbfb5cf/latest_build)
+
 # Fresh Track 🥗
 
 A modern Flutter application for tracking food items in your fridge, managing expiration dates, and reducing food waste. Fresh Track helps you stay organized, save money, and make better use of your groceries.
