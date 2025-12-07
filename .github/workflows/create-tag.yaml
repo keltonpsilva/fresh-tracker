@@ -1,0 +1,47 @@
+name: Release Versioning
+
+on:
+  workflow_call:
+    inputs:
+      new_version:
+        description: "The new version number to release"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  release-versioning:
+    name: Release Versioning
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: true
+          fetch-depth: 0
+
+      - name: Update pubspec.yaml
+        run: |
+          NEW_VERSION="${{ inputs.new_version }}"
+          sed -i "s/^version: .*/version: $NEW_VERSION/" pubspec.yaml
+          echo "Updated pubspec.yaml to version: $NEW_VERSION"
+
+      - name: Commit and push version update
+        run: |
+          git config --local user.email "${{ github.actor }}@users.noreply.github.com"
+          git config --local user.name "${{ github.actor }}"
+          git add pubspec.yaml
+          git diff --staged --quiet || git commit -m "chore: bump version to ${{ inputs.new_version }}"
+          git push
+
+      - name: Create and push tag
+        run: |
+          TAG_NAME="v${{ inputs.new_version }}"
+          git tag -a "$TAG_NAME" -m "Release ${{ inputs.new_version }}"
+          git push origin "$TAG_NAME"
+          echo "Created and pushed tag: $TAG_NAME"
+
