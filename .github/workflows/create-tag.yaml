@@ -38,9 +38,14 @@ jobs:
       #     git diff --staged --quiet || git commit -m "chore: bump version to ${{ inputs.new_version }}"
       #     git push
 
-      - name: Create and push tag
-        run: |
-          TAG_NAME="v${{ inputs.new_version }}"
-          git tag -a "$TAG_NAME" -m "Release ${{ inputs.new_version }}"
-          git push origin "$TAG_NAME"
-          echo "Created and pushed tag: $TAG_NAME"
+      - name: Create tag
+        uses: actions/github-script@v8
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'refs/tags/${{ inputs.new_version }}',
+              sha: context.sha
+            })
