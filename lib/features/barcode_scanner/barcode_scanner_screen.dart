@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class BarcodeScannerScreen extends StatefulWidget {
   const BarcodeScannerScreen({super.key});
@@ -11,6 +12,60 @@ class BarcodeScannerScreen extends StatefulWidget {
 class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
   final MobileScannerController _controller = MobileScannerController();
   String? _scannedBarcode;
+  bool _hasPermission = false;
+  bool _isCheckingPermission = true;
+  bool _isPermissionPermanentlyDenied = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkAndRequestCameraPermission();
+  }
+
+  Future<void> _checkAndRequestCameraPermission() async {
+    final status = await Permission.camera.status;
+    
+    if (status.isGranted) {
+      setState(() {
+        _hasPermission = true;
+        _isCheckingPermission = false;
+        _isPermissionPermanentlyDenied = false;
+      });
+      return;
+    }
+
+    if (status.isPermanentlyDenied) {
+      setState(() {
+        _hasPermission = false;
+        _isCheckingPermission = false;
+        _isPermissionPermanentlyDenied = true;
+      });
+      return;
+    }
+
+    // Request permission immediately to show native dialog
+    final requestStatus = await Permission.camera.request();
+    setState(() {
+      _hasPermission = requestStatus.isGranted;
+      _isCheckingPermission = false;
+      _isPermissionPermanentlyDenied = requestStatus.isPermanentlyDenied;
+    });
+  }
+
+  Future<void> _requestCameraPermission() async {
+    final status = await Permission.camera.request();
+    setState(() {
+      _hasPermission = status.isGranted;
+      _isPermissionPermanentlyDenied = status.isPermanentlyDenied;
+    });
+  }
+
+  Future<void> _openAppSettings() async {
+    await openAppSettings();
+    // Recheck permission after returning from settings
+    await Future.delayed(const Duration(milliseconds: 500));
+    await _checkAndRequestCameraPermission();
+  }
 
   @override
   void dispose() {
@@ -20,6 +75,115 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isCheckingPermission) {
+      return Scaffold(
+        backgroundColor: Colors.white,
+        body: const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    if (!_hasPermission) {
+      return Scaffold(
+        backgroundColor: Colors.white,
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.camera_alt_outlined,
+                  size: 80,
+                  color: Colors.grey[400],
+                ),
+                const SizedBox(height: 24),
+                const Text(
+                  'Camera Permission Required',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF2C2C2C),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  _isPermissionPermanentlyDenied
+                      ? 'Camera permission has been permanently denied. Please enable it in your device settings to scan barcodes.'
+                      : 'This app needs access to your camera to scan barcodes. Please allow camera access to continue.',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey[600],
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 32),
+                if (_isPermissionPermanentlyDenied)
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: _openAppSettings,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF4CAF50),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: const Text(
+                        'Open Settings',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  )
+                else
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: _requestCameraPermission,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF4CAF50),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: const Text(
+                        'Allow Camera Access',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                const SizedBox(height: 12),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text(
+                    'Cancel',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
