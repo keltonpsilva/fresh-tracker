@@ -105,18 +105,88 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFFAFAFA),
+
+      // --- FIXED BUTTON AT BOTTOM ---
+      bottomNavigationBar: SafeArea(
+        minimum: const EdgeInsets.only(
+          left: 24,
+          right: 24,
+          bottom: 64, // Extra padding for Samsung gesture nav
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Next / Sign In Button
+            SizedBox(
+              width: double.infinity,
+              height: 56,
+              child: ElevatedButton(
+                onPressed: _currentPage < _slides.length - 1
+                    ? () => _onGetStartedPressed(context)
+                    : () => _onSignInPressed(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF4CAF50),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 0,
+                ),
+                child: Text(
+                  _currentPage < _slides.length - 1 ? 'Next' : 'Get Started',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+
+            if (_currentPage == _slides.length - 1) ...[
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                height: 56,
+                child: OutlinedButton(
+                  onPressed: _hasImportedDemoData
+                      ? null
+                      : () => _onImportDemoDataPressed(context),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: _hasImportedDemoData
+                        ? Colors.grey
+                        : const Color(0xFF4CAF50),
+                    side: BorderSide(
+                      color: _hasImportedDemoData
+                          ? Colors.grey
+                          : const Color(0xFF4CAF50),
+                      width: 2,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: const Text(
+                    'Import Demo Data',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+
+      // --- MAIN CONTENT ---
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
             children: [
               const SizedBox(height: 20),
-
-              // Refrigerator Illustration
               _buildRefrigeratorIllustration(),
               const SizedBox(height: 32),
 
-              // Title & Subtitle Slider
+              // PageView takes remaining height
               Expanded(
                 child: PageView.builder(
                   controller: _pageController,
@@ -173,69 +243,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 ),
               ),
 
-              const SizedBox(height: 32),
-
-              // Next / Sign In Button
-              SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: ElevatedButton(
-                  onPressed: _currentPage < _slides.length - 1
-                      ? () => _onGetStartedPressed(context)
-                      : () => _onSignInPressed(context),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF4CAF50),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: Text(
-                    _currentPage < _slides.length - 1 ? 'Next' : 'Get Started',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
-
-              // Import Demo Data Button (only on last slide)
-              if (_currentPage == _slides.length - 1) ...[
-                const SizedBox(height: 16),
-                SizedBox(
-                  width: double.infinity,
-                  height: 56,
-                  child: OutlinedButton(
-                    onPressed: _hasImportedDemoData
-                        ? null
-                        : () => _onImportDemoDataPressed(context),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: _hasImportedDemoData
-                          ? Colors.grey
-                          : const Color(0xFF4CAF50),
-                      side: BorderSide(
-                        color: _hasImportedDemoData
-                            ? Colors.grey
-                            : const Color(0xFF4CAF50),
-                        width: 2,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: Text('Import Demo Data',
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-
-              const SizedBox(height: 32),
+              const SizedBox(height: 16),
             ],
           ),
         ),
