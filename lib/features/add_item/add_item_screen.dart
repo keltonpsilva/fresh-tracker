@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:openfoodfacts/openfoodfacts.dart';
 
 import '../../shared/models/food_item.dart';
 import '../../shared/services/i_food_item_service.dart';
 import '../../shared/services/food_item_service_factory.dart';
 
 class AddItemScreen extends StatefulWidget {
-  const AddItemScreen({super.key});
+  final Product? product;
+  
+  const AddItemScreen({super.key, this.product});
 
   @override
   State<AddItemScreen> createState() => _AddItemScreenState();
@@ -30,6 +33,76 @@ class _AddItemScreenState extends State<AddItemScreen> {
     _purchaseDate = DateTime.now();
     _purchaseDateController.text =
         '${_purchaseDate.day.toString().padLeft(2, '0')}/${_purchaseDate.month.toString().padLeft(2, '0')}/${_purchaseDate.year}';
+    
+    // Populate form with product data if available
+    if (widget.product != null) {
+      _populateFormFromProduct(widget.product!);
+    }
+  }
+
+  void _populateFormFromProduct(Product product) {
+    // Set product name
+    if (product.productName != null && product.productName!.isNotEmpty) {
+      _itemNameController.text = product.productName!;
+    }
+
+    // Map OpenFoodFacts category to app category
+    if (product.categories != null && product.categories!.isNotEmpty) {
+      _selectedCategory = _mapOpenFoodFactsCategoryToAppCategory(product.categories!);
+    }
+
+    // Try to extract quantity from product quantity field
+    if (product.quantity != null && product.quantity!.isNotEmpty) {
+      // Try to parse quantity (e.g., "1L", "500g" -> extract number)
+      final quantityMatch = RegExp(r'(\d+)').firstMatch(product.quantity!);
+      if (quantityMatch != null) {
+        final quantityValue = int.tryParse(quantityMatch.group(1) ?? '1');
+        if (quantityValue != null && quantityValue > 0) {
+          _quantity = quantityValue;
+        }
+      }
+    }
+  }
+
+  String? _mapOpenFoodFactsCategoryToAppCategory(String categories) {
+    final categoriesLower = categories.toLowerCase();
+    
+    // Map OpenFoodFacts categories to app categories
+    if (categoriesLower.contains('dairy') || 
+        categoriesLower.contains('milk') || 
+        categoriesLower.contains('cheese') ||
+        categoriesLower.contains('yogurt')) {
+      return 'Dairy';
+    }
+    if (categoriesLower.contains('meat') || 
+        categoriesLower.contains('poultry') || 
+        categoriesLower.contains('fish') ||
+        categoriesLower.contains('seafood')) {
+      return 'Meat';
+    }
+    if (categoriesLower.contains('fruit') || 
+        categoriesLower.contains('vegetable') || 
+        categoriesLower.contains('produce')) {
+      return 'Produce';
+    }
+    if (categoriesLower.contains('beverage') || 
+        categoriesLower.contains('drink') || 
+        categoriesLower.contains('juice') ||
+        categoriesLower.contains('soda')) {
+      return 'Beverages';
+    }
+    if (categoriesLower.contains('snack') || 
+        categoriesLower.contains('chip') || 
+        categoriesLower.contains('cracker')) {
+      return 'Snacks';
+    }
+    if (categoriesLower.contains('frozen') || 
+        categoriesLower.contains('ice cream')) {
+      return 'Frozen';
+    }
+    
+    // Default to "Other" if no match
+    return 'Other';
   }
 
   final List<String> _categories = [
