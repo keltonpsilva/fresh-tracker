@@ -91,11 +91,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 InkWell(
                   onTap: () async {
                     Navigator.of(context).pop();
-                    await Navigator.of(context).push(
+                    final result = await Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) => const BarcodeScannerScreen(),
                       ),
                     );
+                    // Reload items if an item was added (result is true)
+                    if (result == true) {
+                      _loadItems();
+                    }
                   },
                   borderRadius: BorderRadius.circular(12),
                   child: Container(

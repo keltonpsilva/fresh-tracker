@@ -588,12 +588,17 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
                               child: ElevatedButton(
                                 onPressed: () async {
                                   // Navigate to AddItemScreen with product data (if available)
-                                  await Navigator.of(context).pushReplacement(
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          AddItemScreen(product: _product),
-                                    ),
-                                  );
+                                  final result = await Navigator.of(context)
+                                      .push(
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              AddItemScreen(product: _product),
+                                        ),
+                                      );
+                                  // If item was added, pop back to dashboard
+                                  if (result == true && mounted) {
+                                    Navigator.of(context).pop(true);
+                                  }
                                 },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color(0xFF4CAF50),
