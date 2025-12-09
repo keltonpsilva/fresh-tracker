@@ -73,29 +73,30 @@ class _AddItemScreenState extends State<AddItemScreen> {
   DateTime _getEstimatedExpirationDate(String category) {
     final now = DateTime.now();
 
+    // Estimates are based on opened products (shorter shelf life than unopened)
     switch (category) {
       case 'Produce':
-        // Fresh produce typically lasts 3-7 days
+        // Fresh produce (opened) typically lasts 3-7 days
         return now.add(const Duration(days: 5));
       case 'Dairy':
-        // Dairy products typically last 5-10 days
-        return now.add(const Duration(days: 7));
+        // Dairy products (opened) typically last 3-7 days
+        return now.add(const Duration(days: 5));
       case 'Meat':
-        // Meat typically lasts 2-5 days
-        return now.add(const Duration(days: 3));
+        // Meat (opened) typically lasts 1-3 days
+        return now.add(const Duration(days: 2));
       case 'Beverages':
-        // Beverages typically last 30-90 days (unopened)
-        return now.add(const Duration(days: 60));
+        // Beverages (opened) typically last 3-7 days
+        return now.add(const Duration(days: 5));
       case 'Snacks':
-        // Snacks typically last 30-180 days
-        return now.add(const Duration(days: 90));
+        // Snacks (opened) typically last 7-14 days
+        return now.add(const Duration(days: 30));
       case 'Frozen':
-        // Frozen items typically last 6-12 months
-        return now.add(const Duration(days: 180));
+        // Frozen items (thawed/opened) typically last 1-3 days
+        return now.add(const Duration(days: 90));
       case 'Other':
       default:
-        // Default to 7 days for other items
-        return now.add(const Duration(days: 7));
+        // Default to 5 days for other opened items
+        return now.add(const Duration(days: 5));
     }
   }
 
