@@ -48,12 +48,55 @@ class _AddItemScreenState extends State<AddItemScreen> {
 
     // Map OpenFoodFacts category to app category
     if (product.categories != null && product.categories!.isNotEmpty) {
-      _selectedCategory = _mapOpenFoodFactsCategoryToAppCategory(
+      final category = _mapOpenFoodFactsCategoryToAppCategory(
         product.categories!,
       );
+      _selectedCategory = category;
+      // Set estimated expiration date based on category
+      if (category != null) {
+        _setEstimatedExpirationDate(category);
+      }
     }
 
     // Quantity is always 1 (not extracted from product)
+  }
+
+  void _setEstimatedExpirationDate(String category) {
+    final estimatedDate = _getEstimatedExpirationDate(category);
+    setState(() {
+      _expirationDate = estimatedDate;
+      _expirationDateController.text =
+          '${estimatedDate.day.toString().padLeft(2, '0')}/${estimatedDate.month.toString().padLeft(2, '0')}/${estimatedDate.year}';
+    });
+  }
+
+  DateTime _getEstimatedExpirationDate(String category) {
+    final now = DateTime.now();
+
+    switch (category) {
+      case 'Produce':
+        // Fresh produce typically lasts 3-7 days
+        return now.add(const Duration(days: 5));
+      case 'Dairy':
+        // Dairy products typically last 5-10 days
+        return now.add(const Duration(days: 7));
+      case 'Meat':
+        // Meat typically lasts 2-5 days
+        return now.add(const Duration(days: 3));
+      case 'Beverages':
+        // Beverages typically last 30-90 days (unopened)
+        return now.add(const Duration(days: 60));
+      case 'Snacks':
+        // Snacks typically last 30-180 days
+        return now.add(const Duration(days: 90));
+      case 'Frozen':
+        // Frozen items typically last 6-12 months
+        return now.add(const Duration(days: 180));
+      case 'Other':
+      default:
+        // Default to 7 days for other items
+        return now.add(const Duration(days: 7));
+    }
   }
 
   String? _mapOpenFoodFactsCategoryToAppCategory(String categories) {
@@ -368,6 +411,10 @@ class _AddItemScreenState extends State<AddItemScreen> {
                           setState(() {
                             _selectedCategory = value;
                           });
+                          // Set estimated expiration date based on selected category
+                          if (value != null) {
+                            _setEstimatedExpirationDate(value);
+                          }
                         },
                       ),
                     ),
