@@ -592,7 +592,7 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
                                         ),
                                       );
                                   // If item was added, pop back to dashboard
-                                  if (result == true && mounted) {
+                                  if (result == true && context.mounted) {
                                     Navigator.of(context).pop(true);
                                   }
                                 },
