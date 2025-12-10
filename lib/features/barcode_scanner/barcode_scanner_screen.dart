@@ -99,13 +99,6 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
         configuration,
       );
 
-      // Debug: Print result to understand the structure
-      print('Result status: ${result.status}');
-      print('Result product: ${result.product != null ? "exists" : "null"}');
-      if (result.result != null) {
-        print('Result result.id: ${result.result!.id}');
-      }
-
       // Check if product was found - the product object being non-null is the most reliable indicator
       if (result.product != null) {
         setState(() {
