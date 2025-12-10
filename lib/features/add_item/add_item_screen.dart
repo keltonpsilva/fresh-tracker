@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:openfoodfacts/openfoodfacts.dart';
 
 import '../../shared/models/food_item.dart';
 import '../../shared/services/i_food_item_service.dart';
 import '../../shared/services/food_item_service_factory.dart';
 
 class AddItemScreen extends StatefulWidget {
-  const AddItemScreen({super.key});
+  final Product? product;
+
+  const AddItemScreen({super.key, this.product});
 
   @override
   State<AddItemScreen> createState() => _AddItemScreenState();
@@ -30,6 +33,112 @@ class _AddItemScreenState extends State<AddItemScreen> {
     _purchaseDate = DateTime.now();
     _purchaseDateController.text =
         '${_purchaseDate.day.toString().padLeft(2, '0')}/${_purchaseDate.month.toString().padLeft(2, '0')}/${_purchaseDate.year}';
+
+    // Populate form with product data if available
+    if (widget.product != null) {
+      _populateFormFromProduct(widget.product!);
+    }
+  }
+
+  void _populateFormFromProduct(Product product) {
+    // Set product name
+    if (product.productName != null && product.productName!.isNotEmpty) {
+      _itemNameController.text = product.productName!;
+    }
+
+    // Map OpenFoodFacts category to app category
+    if (product.categories != null && product.categories!.isNotEmpty) {
+      final category = _mapOpenFoodFactsCategoryToAppCategory(
+        product.categories!,
+      );
+      _selectedCategory = category;
+      // Set estimated expiration date based on category
+      if (category != null) {
+        _setEstimatedExpirationDate(category);
+      }
+    }
+
+    // Quantity is always 1 (not extracted from product)
+  }
+
+  void _setEstimatedExpirationDate(String category) {
+    final estimatedDate = _getEstimatedExpirationDate(category);
+    setState(() {
+      _expirationDate = estimatedDate;
+      _expirationDateController.text =
+          '${estimatedDate.day.toString().padLeft(2, '0')}/${estimatedDate.month.toString().padLeft(2, '0')}/${estimatedDate.year}';
+    });
+  }
+
+  DateTime _getEstimatedExpirationDate(String category) {
+    final now = DateTime.now();
+
+    // Estimates are based on opened products (shorter shelf life than unopened)
+    switch (category) {
+      case 'Produce':
+        // Fresh produce (opened) typically lasts 3-7 days
+        return now.add(const Duration(days: 5));
+      case 'Dairy':
+        // Dairy products (opened) typically last 3-7 days
+        return now.add(const Duration(days: 5));
+      case 'Meat':
+        // Meat (opened) typically lasts 1-3 days
+        return now.add(const Duration(days: 2));
+      case 'Beverages':
+        // Beverages (opened) typically last 3-7 days
+        return now.add(const Duration(days: 5));
+      case 'Snacks':
+        // Snacks (opened) typically last 7-14 days
+        return now.add(const Duration(days: 30));
+      case 'Frozen':
+        // Frozen items (thawed/opened) typically last 1-3 days
+        return now.add(const Duration(days: 90));
+      case 'Other':
+      default:
+        // Default to 5 days for other opened items
+        return now.add(const Duration(days: 5));
+    }
+  }
+
+  String? _mapOpenFoodFactsCategoryToAppCategory(String categories) {
+    final categoriesLower = categories.toLowerCase();
+
+    // Map OpenFoodFacts categories to app categories
+    if (categoriesLower.contains('dairy') ||
+        categoriesLower.contains('milk') ||
+        categoriesLower.contains('cheese') ||
+        categoriesLower.contains('yogurt')) {
+      return 'Dairy';
+    }
+    if (categoriesLower.contains('meat') ||
+        categoriesLower.contains('poultry') ||
+        categoriesLower.contains('fish') ||
+        categoriesLower.contains('seafood')) {
+      return 'Meat';
+    }
+    if (categoriesLower.contains('fruit') ||
+        categoriesLower.contains('vegetable') ||
+        categoriesLower.contains('produce')) {
+      return 'Produce';
+    }
+    if (categoriesLower.contains('beverage') ||
+        categoriesLower.contains('drink') ||
+        categoriesLower.contains('juice') ||
+        categoriesLower.contains('soda')) {
+      return 'Beverages';
+    }
+    if (categoriesLower.contains('snack') ||
+        categoriesLower.contains('chip') ||
+        categoriesLower.contains('cracker')) {
+      return 'Snacks';
+    }
+    if (categoriesLower.contains('frozen') ||
+        categoriesLower.contains('ice cream')) {
+      return 'Frozen';
+    }
+
+    // Default to "Other" if no match
+    return 'Other';
   }
 
   final List<String> _categories = [
@@ -185,7 +294,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('Item added to fridge!')));
-      Navigator.of(context).pop();
+      Navigator.of(context).pop(true); // Return true to indicate item was added
     }
   }
 
@@ -303,6 +412,10 @@ class _AddItemScreenState extends State<AddItemScreen> {
                           setState(() {
                             _selectedCategory = value;
                           });
+                          // Set estimated expiration date based on selected category
+                          if (value != null) {
+                            _setEstimatedExpirationDate(value);
+                          }
                         },
                       ),
                     ),
