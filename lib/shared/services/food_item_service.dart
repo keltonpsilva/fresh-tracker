@@ -139,6 +139,35 @@ class FoodItemService implements IFoodItemService {
     };
   }
 
+  /// Helper to get IconData from code point using const instances where possible
+  /// This allows tree-shaking for known icons
+  static IconData _getIconDataFromCodePoint(int codePoint) {
+    // Map of known icon code points to const IconData instances for tree-shaking
+    // Using Icons constants ensures tree-shaking works correctly
+    switch (codePoint) {
+      case 0xe21c: // Icons.egg.codePoint
+        return Icons.egg;
+      case 0xe4c8: // Icons.water_drop.codePoint
+        return Icons.water_drop;
+      case 0xe56c: // Icons.restaurant.codePoint
+        return Icons.restaurant;
+      case 0xe1c8: // Icons.eco.codePoint
+        return Icons.eco;
+      case 0xe560: // Icons.lunch_dining.codePoint
+        return Icons.lunch_dining;
+      case 0xe56d: // Icons.local_drink.codePoint
+        return Icons.local_drink;
+      case 0xe1ca: // Icons.ac_unit.codePoint
+        return Icons.ac_unit;
+      case 0xe8cc: // Icons.shopping_bag.codePoint
+        return Icons.shopping_bag;
+      default:
+        // For unknown icons, create IconData dynamically
+        // This cannot be tree-shaken but is necessary for dynamic icons
+        return IconData(codePoint, fontFamily: 'MaterialIcons');
+    }
+  }
+
   /// -------------------------
   /// FIXED: NO dynamic IconData
   /// -------------------------
@@ -152,11 +181,8 @@ class FoodItemService implements IFoodItemService {
       ),
       statusColor: Color(map['status_color'] as int),
 
-      /// SAFE icon lookup
-      icon: IconData(
-        map['icon_code_point'] as int,
-        fontFamily: 'MaterialIcons',
-      ),
+      /// SAFE icon lookup - using const instances where possible
+      icon: _getIconDataFromCodePoint(map['icon_code_point'] as int),
 
       iconBackgroundColor: Color(map['icon_background_color'] as int),
 
