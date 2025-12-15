@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../add_item/add_item_screen.dart';
 import '../item_details/item_details_screen.dart';
 import '../barcode_scanner/barcode_scanner_screen.dart';
+import '../edit_item/edit_item_screen.dart';
 import '../../shared/models/food_item.dart';
 import '../../shared/services/i_food_item_service.dart';
 import '../../shared/services/food_item_service_factory.dart';
@@ -536,12 +537,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
             // More options icon
             PopupMenuButton<String>(
               icon: const Icon(Icons.more_vert, color: Colors.grey),
-              onSelected: (value) {
-                if (value == 'delete') {
+              onSelected: (value) async {
+                if (value == 'edit') {
+                  await Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => EditItemScreen(item: item),
+                    ),
+                  );
+                  _loadItems(); // Reload items after returning from edit screen
+                } else if (value == 'delete') {
                   _showDeleteConfirmation(item);
                 }
               },
               itemBuilder: (context) => [
+                const PopupMenuItem<String>(
+                  value: 'edit',
+                  child: Row(
+                    children: [
+                      Icon(Icons.edit, color: Color(0xFF2C2C2C), size: 20),
+                      SizedBox(width: 8),
+                      Text('Edit', style: TextStyle(color: Color(0xFF2C2C2C))),
+                    ],
+                  ),
+                ),
                 const PopupMenuItem<String>(
                   value: 'delete',
                   child: Row(
