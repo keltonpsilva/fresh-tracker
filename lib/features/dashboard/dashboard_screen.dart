@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../add_item/add_item_screen.dart';
@@ -48,6 +51,58 @@ class _DashboardScreenState extends State<DashboardScreen> {
         _isLoading = false;
       });
     }
+  }
+
+  void _showActionMenu(FoodItem item) {
+    // This method is only called on iOS
+    // Android uses PopupMenuButton directly which handles its own menu
+    if (Platform.isIOS) {
+      _showIOSActionSheet(item);
+    }
+  }
+
+  void _showIOSActionSheet(FoodItem item) {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) => CupertinoActionSheet(
+        actions: [
+          CupertinoActionSheetAction(
+            onPressed: () {
+              Navigator.of(context).pop();
+              Navigator.of(context)
+                  .push(
+                    MaterialPageRoute(
+                      builder: (context) => EditItemScreen(item: item),
+                    ),
+                  )
+                  .then((_) => _loadItems());
+            },
+            child: const Text(
+              'Edit',
+              style: TextStyle(fontSize: 17, color: Color(0xFF007AFF)),
+            ),
+          ),
+          CupertinoActionSheetAction(
+            isDestructiveAction: true,
+            onPressed: () {
+              Navigator.of(context).pop();
+              _showDeleteConfirmation(item);
+            },
+            child: const Text(
+              'Delete',
+              style: TextStyle(fontSize: 17, color: Colors.red),
+            ),
+          ),
+        ],
+        cancelButton: CupertinoActionSheetAction(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text(
+            'Cancel',
+            style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+          ),
+        ),
+      ),
+    );
   }
 
   void _showDeleteConfirmation(FoodItem item) {
@@ -534,44 +589,100 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
 
-            // More options icon
-            PopupMenuButton<String>(
-              icon: const Icon(Icons.more_vert, color: Colors.grey),
-              onSelected: (value) async {
-                if (value == 'edit') {
-                  await Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => EditItemScreen(item: item),
+            // More options icon - Platform specific
+            Platform.isIOS
+                ? IconButton(
+                    icon: const Icon(Icons.more_vert, color: Colors.grey),
+                    onPressed: () => _showActionMenu(item),
+                  )
+                : PopupMenuButton<String>(
+                    icon: const Icon(Icons.more_vert, color: Colors.grey),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                  );
-                  _loadItems(); // Reload items after returning from edit screen
-                } else if (value == 'delete') {
-                  _showDeleteConfirmation(item);
-                }
-              },
-              itemBuilder: (context) => [
-                const PopupMenuItem<String>(
-                  value: 'edit',
-                  child: Row(
-                    children: [
-                      Icon(Icons.edit, color: Color(0xFF2C2C2C), size: 20),
-                      SizedBox(width: 8),
-                      Text('Edit', style: TextStyle(color: Color(0xFF2C2C2C))),
+                    elevation: 8,
+                    onSelected: (value) async {
+                      if (value == 'edit') {
+                        await Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => EditItemScreen(item: item),
+                          ),
+                        );
+                        _loadItems(); // Reload items after returning from edit screen
+                      } else if (value == 'delete') {
+                        _showDeleteConfirmation(item);
+                      }
+                    },
+                    itemBuilder: (context) => [
+                      PopupMenuItem<String>(
+                        value: 'edit',
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 36,
+                              height: 36,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFE5F0FF),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Icon(
+                                Icons.edit,
+                                color: Color(0xFF2196F3),
+                                size: 18,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            const Text(
+                              'Edit',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w500,
+                                color: Color(0xFF2C2C2C),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const PopupMenuDivider(),
+                      PopupMenuItem<String>(
+                        value: 'delete',
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 36,
+                              height: 36,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFFFE5E5),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Icon(
+                                Icons.delete_outline,
+                                color: Colors.red,
+                                size: 18,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            const Text(
+                              'Delete',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.red,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
-                ),
-                const PopupMenuItem<String>(
-                  value: 'delete',
-                  child: Row(
-                    children: [
-                      Icon(Icons.delete, color: Colors.red, size: 20),
-                      SizedBox(width: 8),
-                      Text('Delete', style: TextStyle(color: Colors.red)),
-                    ],
-                  ),
-                ),
-              ],
-            ),
           ],
         ),
       ),
