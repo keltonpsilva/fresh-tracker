@@ -13,8 +13,8 @@ jobs:
   # 0. GENERATE VERSION
   # -------------------------------------------
 
-  generate-version-early:
-    uses: ./.github/workflows/generate-version-early.yaml
+  generate-version:
+    uses: ./.github/workflows/generate-version.yaml
 
   analyze-and-test:
     name: Analyze & Test
@@ -47,7 +47,7 @@ jobs:
   build-web:
     name: Build Web
     runs-on: ubuntu-latest
-    needs: [analyze-and-test, generate-version-early]
+    needs: [analyze-and-test, generate-version]
 
     steps:
       - name: Checkout
@@ -63,7 +63,7 @@ jobs:
         run: flutter pub get
 
       - name: Build Web
-        run: flutter build web --release --build-name=${{ needs.generate-version-early.outputs.build-name }} --build-number=${{ needs.generate-version-early.outputs.build-number }}
+        run: flutter build web --release --build-name=${{ needs.generate-version.outputs.build-name }} --build-number=${{ needs.generate-version.outputs.build-number }}
 
       - name: Upload Web Artifacts
         uses: actions/upload-artifact@v4
@@ -79,7 +79,7 @@ jobs:
   build-android:
     name: Build Android
     runs-on: ubuntu-latest
-    needs: [analyze-and-test, generate-version-early]
+    needs: [analyze-and-test, generate-version]
 
     steps:
       - name: Checkout
@@ -101,7 +101,7 @@ jobs:
         run: flutter pub get
 
       - name: Build Android APK
-        run: flutter build apk --release --build-name=${{ needs.generate-version-early.outputs.build-name }} --build-number=${{ needs.generate-version-early.outputs.build-number }}
+        run: flutter build apk --release --build-name=${{ needs.generate-version.outputs.build-name }} --build-number=${{ needs.generate-version.outputs.build-number }}
 
       - name: Upload Android Artifacts
         uses: actions/upload-artifact@v4
