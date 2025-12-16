@@ -9,6 +9,13 @@ permissions:
   contents: write
 
 jobs:
+  # -------------------------------------------
+  # 0. GENERATE VERSION
+  # -------------------------------------------
+
+  generate-version:
+    uses: ./.github/workflows/generate-version.yaml
+
   analyze-and-test:
     name: Analyze & Test
     runs-on: ubuntu-latest
@@ -40,7 +47,7 @@ jobs:
   build-web:
     name: Build Web
     runs-on: ubuntu-latest
-    needs: [analyze-and-test]
+    needs: [analyze-and-test, generate-version]
 
     steps:
       - name: Checkout
@@ -56,7 +63,7 @@ jobs:
         run: flutter pub get
 
       - name: Build Web
-        run: flutter build web --release
+        run: flutter build web --release --build-name=${{ needs.generate-version.outputs.build-name }} --build-number=${{ needs.generate-version.outputs.build-number }}
 
       - name: Upload Web Artifacts
         uses: actions/upload-artifact@v4
@@ -72,7 +79,7 @@ jobs:
   build-android:
     name: Build Android
     runs-on: ubuntu-latest
-    needs: [analyze-and-test]
+    needs: [analyze-and-test, generate-version]
 
     steps:
       - name: Checkout
@@ -94,7 +101,7 @@ jobs:
         run: flutter pub get
 
       - name: Build Android APK
-        run: flutter build apk --release
+        run: flutter build apk --release --build-name=${{ needs.generate-version.outputs.build-name }} --build-number=${{ needs.generate-version.outputs.build-number }}
 
       - name: Upload Android Artifacts
         uses: actions/upload-artifact@v4
@@ -103,135 +110,25 @@ jobs:
           path: build/app/outputs/flutter-apk/app-release.apk
           retention-days: 30
 
-  # -------------------------------------------
-  # 4. GENERATE VERSIONING
-  # -------------------------------------------
-
-  generate-versioning:
-    needs: [build-android, build-web]
-    uses: ./.github/workflows/generate-versioning.yaml
-    if: github.event_name == 'push' && ((github.ref == 'refs/heads/main') || startsWith(github.ref_name, 'release'))
 
   # -------------------------------------------
   # 5. CREATE TAG
   # -------------------------------------------
 
   create-tag:
-    needs: [generate-versioning]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          persist-credentials: true
-          fetch-depth: 0
-
-      - name: Create tag
-        uses: actions/github-script@v8
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            github.rest.git.createRef({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: 'refs/tags/${{ needs.generate-versioning.outputs.version }}',
-              sha: context.sha
-            })
+    needs: [generate-version, build-android, build-web]
+    uses: ./.github/workflows/create-tag.yaml
+    if: github.event_name == 'push' && ((github.ref == 'refs/heads/main') || startsWith(github.ref_name, 'release'))
+    with:
+      version: ${{ needs.generate-version.outputs.version }}
 
   # -------------------------------------------
   # 6. CREATE RELEASE
   # -------------------------------------------
 
   create-release:
-    runs-on: ubuntu-latest
-    needs: [generate-versioning, create-tag]
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Download Web Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: web-build
-          path: build/web/
-
-      - name: Download Android Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: android-build
-          path: build/android/
-
-      - name: Create zip archive for web
-        run: |
-          cd build/web
-          zip -r ../../web-build.zip .
-          cd ../..
-
-      - name: Create Release
-        uses: actions/github-script@v8
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const version = '${{ needs.generate-versioning.outputs.version }}';
-            const fs = require('fs');
-            const path = require('path');
-
-            // Check if release already exists, if not create it
-            let release;
-            try {
-              const existingRelease = await github.rest.repos.getReleaseByTag({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                tag: version
-              });
-              release = existingRelease.data;
-            } catch (error) {
-              // Release doesn't exist, create it
-              release = await github.rest.repos.createRelease({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                tag_name: version,
-                name: `${version}`,
-                generate_release_notes: true,
-                draft: false,
-                prerelease: ${{ github.ref == 'refs/heads/main' }}
-              }).then(res => res.data);
-            }
-
-            // Upload web build zip
-            const webBuildZip = fs.readFileSync('web-build.zip');
-            await github.rest.repos.uploadReleaseAsset({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              release_id: release.id,
-              name: 'web-build.zip',
-              data: webBuildZip,
-              headers: {
-                'content-type': 'application/zip',
-                'content-length': webBuildZip.length
-              }
-            });
-
-            // Upload Android APK
-            const androidDir = 'build/android';
-            if (fs.existsSync(androidDir)) {
-              const files = fs.readdirSync(androidDir);
-              const apkFile = files.find(file => file.endsWith('.apk'));
-              if (apkFile) {
-                const androidApkPath = path.join(androidDir, apkFile);
-                const androidApk = fs.readFileSync(androidApkPath);
-                await github.rest.repos.uploadReleaseAsset({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  release_id: release.id,
-                  name: apkFile,
-                  data: androidApk,
-                  headers: {
-                    'content-type': 'application/vnd.android.package-archive',
-                    'content-length': androidApk.length
-                  }
-                });
-              }
-            }
+    needs: [generate-version, create-tag]
+    uses: ./.github/workflows/create-release.yaml
+    with:
+      version: ${{ needs.generate-version.outputs.version }}
+      prerelease: ${{ github.ref == 'refs/heads/main' }}

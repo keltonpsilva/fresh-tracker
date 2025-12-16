@@ -1,10 +1,10 @@
-name: Release Versioning
+name: Create Tag
 
 on:
   workflow_call:
     inputs:
-      new_version:
-        description: "The new version number to release"
+      version:
+        description: "The version number (with 'v' prefix) to use for the tag"
         required: true
         type: string
 
@@ -12,8 +12,8 @@ permissions:
   contents: write
 
 jobs:
-  release-versioning:
-    name: Release Versioning
+  create-tag:
+    name: Create Tag
     runs-on: ubuntu-latest
 
     steps:
@@ -32,30 +32,6 @@ jobs:
             github.rest.git.createRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              ref: 'refs/tags/${{ inputs.new_version }}',
+              ref: 'refs/tags/${{ inputs.version }}',
               sha: context.sha
             })
-
-      # - name: Download APK
-      #   uses: actions/download-artifact@v4
-      #   with:
-      #     name: android-${{ env.APPLICATION_NAME }}-${{ needs.generate-versioning.outputs.version }}
-      #     path: dist/
-
-      # - name: Download Web
-      #   uses: actions/download-artifact@v4
-      #   with:
-      #     name: web-${{ env.APPLICATION_NAME }}-${{ needs.generate-versioning.outputs.version }}
-      #     path: dist/
-
-      # - name: Create GitHub Release
-      #   uses: softprops/action-gh-release@v2
-      #   with:
-      #     tag_name: ${{ inputs.new_version }}
-      #     name: ${{ inputs.new_version }}
-      #     prerelease: ${{ github.ref == 'refs/heads/main' }}
-      #     # files: |
-      #       # web-${{ env.APPLICATION_NAME }}-${{ needs.generate-versioning.outputs.version }}
-      #       # android-${{ env.APPLICATION_NAME }}-${{ needs.generate-versioning.outputs.version }}
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

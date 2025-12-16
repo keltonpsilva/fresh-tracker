@@ -1,22 +1,30 @@
-name: Generate Versioning
+name: Generate Version Early
 
 on:
   workflow_call:
     outputs:
       version:
         description: "The full version number including 'v' prefix to use for the application"
-        value: ${{ jobs.generate-versioning.outputs.VERSION }}
+        value: ${{ jobs.generate-version-early.outputs.VERSION }}
       version-number:
         description: "The version number without the 'v' prefix to use for the application"
-        value: ${{ jobs.generate-versioning.outputs.VERSION_NUMBER }}
+        value: ${{ jobs.generate-version-early.outputs.VERSION_NUMBER }}
+      build-name:
+        description: "The build name (version without rc suffix) to use for Flutter builds"
+        value: ${{ jobs.generate-version-early.outputs.BUILD_NAME }}
+      build-number:
+        description: "The build number to use for Flutter builds"
+        value: ${{ jobs.generate-version-early.outputs.BUILD_NUMBER }}
 
 jobs:
-  generate-versioning:
-    name: Generate Versioning
+  generate-version-early:
+    name: Generate Version (Early)
     runs-on: ubuntu-latest
     outputs:
       VERSION: ${{ steps.generate-tag-version.outputs.VERSION }}
       VERSION_NUMBER: ${{ steps.generate-tag-version.outputs.VERSION_NUMBER }}
+      BUILD_NAME: ${{ steps.generate-tag-version.outputs.BUILD_NAME }}
+      BUILD_NUMBER: ${{ steps.generate-tag-version.outputs.BUILD_NUMBER }}
 
     steps:
       - name: Checkout
@@ -51,6 +59,8 @@ jobs:
           # Check if GITHUB_REF contains 'release' 
           if [[ "$GITHUB_REF" == *release* ]]; then
             export VERSION="$MAJOR_MINOR.$PATCH"
+            export BUILD_NAME="$MAJOR_MINOR.$PATCH"
+            export BUILD_NUMBER="1"
           else
             # Generate Pre tag version
             if [[ "$TAG" == *-rc-* ]]; then
@@ -68,8 +78,17 @@ jobs:
               BUILDNUMBER=1
             fi
             export VERSION="$MAJOR_MINOR.$NEXT_PATCH-rc-$BUILDNUMBER"
+            export BUILD_NAME="$MAJOR_MINOR.$NEXT_PATCH"
+            export BUILD_NUMBER="$BUILDNUMBER"
           fi
 
-          echo "Setting version to $VERSION"
-          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
-          echo "VERSION_NUMBER=${VERSION:1}" >> $GITHUB_OUTPUT
+          # Add 'v' prefix to version for tags
+          VERSION_WITH_PREFIX="v$VERSION"
+          # Extract version number without 'v' prefix if present
+          VERSION_NUMBER=$VERSION
+
+          echo "Setting version to $VERSION_WITH_PREFIX"
+          echo "VERSION=$VERSION_WITH_PREFIX" >> $GITHUB_OUTPUT
+          echo "VERSION_NUMBER=$VERSION_NUMBER" >> $GITHUB_OUTPUT
+          echo "BUILD_NAME=$BUILD_NAME" >> $GITHUB_OUTPUT
+          echo "BUILD_NUMBER=$BUILD_NUMBER" >> $GITHUB_OUTPUT
