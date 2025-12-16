@@ -116,7 +116,7 @@ jobs:
   # -------------------------------------------
 
   create-tag:
-    needs: [generate-version]
+    needs: [generate-version, build-android, build-web]
     uses: ./.github/workflows/create-tag.yaml
     with:
       version: ${{ needs.generate-version.outputs.version }}
