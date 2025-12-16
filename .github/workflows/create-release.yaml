@@ -1,0 +1,121 @@
+name: Create Release
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        description: "The version number (with 'v' prefix) to use for the release"
+        required: true
+        type: string
+      prerelease:
+        description: "Whether the release should be marked as a prerelease"
+        required: true
+        type: boolean
+      web-artifact-name:
+        description: "The name of the web build artifact"
+        required: false
+        type: string
+        default: "web-build"
+      android-artifact-name:
+        description: "The name of the android build artifact"
+        required: false
+        type: string
+        default: "android-build"
+
+permissions:
+  contents: write
+
+jobs:
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download Web Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.web-artifact-name }}
+          path: build/web/
+
+      - name: Download Android Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.android-artifact-name }}
+          path: build/android/
+
+      - name: Create zip archive for web
+        run: |
+          cd build/web
+          zip -r ../../web-build.zip .
+          cd ../..
+
+      - name: Create Release
+        uses: actions/github-script@v8
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const version = '${{ inputs.version }}';
+            const fs = require('fs');
+            const path = require('path');
+            const prerelease = ${{ inputs.prerelease }};
+
+            // Check if release already exists, if not create it
+            let release;
+            try {
+              const existingRelease = await github.rest.repos.getReleaseByTag({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                tag: version
+              });
+              release = existingRelease.data;
+            } catch (error) {
+              // Release doesn't exist, create it
+              release = await github.rest.repos.createRelease({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                tag_name: version,
+                name: `${version}`,
+                generate_release_notes: true,
+                draft: false,
+                prerelease: prerelease
+              }).then(res => res.data);
+            }
+
+            // Upload web build zip
+            const webBuildZip = fs.readFileSync('web-build.zip');
+            await github.rest.repos.uploadReleaseAsset({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id: release.id,
+              name: 'web-build.zip',
+              data: webBuildZip,
+              headers: {
+                'content-type': 'application/zip',
+                'content-length': webBuildZip.length
+              }
+            });
+
+            // Upload Android APK
+            const androidDir = 'build/android';
+            if (fs.existsSync(androidDir)) {
+              const files = fs.readdirSync(androidDir);
+              const apkFile = files.find(file => file.endsWith('.apk'));
+              if (apkFile) {
+                const androidApkPath = path.join(androidDir, apkFile);
+                const androidApk = fs.readFileSync(androidApkPath);
+                await github.rest.repos.uploadReleaseAsset({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  release_id: release.id,
+                  name: apkFile,
+                  data: androidApk,
+                  headers: {
+                    'content-type': 'application/vnd.android.package-archive',
+                    'content-length': androidApk.length
+                  }
+                });
+              }
+            }
