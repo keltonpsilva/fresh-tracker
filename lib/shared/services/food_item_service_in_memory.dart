@@ -19,11 +19,11 @@ class FoodItemServiceInMemory implements IFoodItemService {
       name: 'Organic Eggs',
       category: 'Dairy',
       subcategory: 'Dairy & Eggs',
-      expirationDate: DateTime.now().subtract(const Duration(days: 1)),
+      useByDate: DateTime.now().subtract(const Duration(days: 1)),
       statusColor: Colors.red,
       icon: Icons.egg,
       iconBackgroundColor: const Color(0xFFFFE5E5),
-      purchaseDate: DateTime.now().subtract(const Duration(days: 8)),
+      openDate: DateTime.now().subtract(const Duration(days: 8)),
       quantity: 1,
       quantityUnit: 'dozen',
     ),
@@ -31,11 +31,11 @@ class FoodItemServiceInMemory implements IFoodItemService {
       name: 'Milk',
       category: 'Dairy',
       subcategory: 'Dairy',
-      expirationDate: DateTime.now().add(const Duration(days: 1)),
+      useByDate: DateTime.now().add(const Duration(days: 1)),
       statusColor: Colors.orange,
       icon: Icons.water_drop,
       iconBackgroundColor: const Color(0xFFFFF4E5),
-      purchaseDate: DateTime.now().subtract(const Duration(days: 6)),
+      openDate: DateTime.now().subtract(const Duration(days: 6)),
       quantity: 1,
       quantityUnit: 'Gallon',
       notes: 'Opened recently. Keep in the main compartment, not the door.',
@@ -44,11 +44,11 @@ class FoodItemServiceInMemory implements IFoodItemService {
       name: 'Chicken Breast',
       category: 'Meat',
       subcategory: 'Meat',
-      expirationDate: DateTime.now().add(const Duration(days: 3)),
+      useByDate: DateTime.now().add(const Duration(days: 3)),
       statusColor: Colors.green,
       icon: Icons.restaurant,
       iconBackgroundColor: const Color(0xFFE5F5E5),
-      purchaseDate: DateTime.now().subtract(const Duration(days: 2)),
+      openDate: DateTime.now().subtract(const Duration(days: 2)),
       quantity: 2,
       quantityUnit: 'lbs',
     ),
@@ -56,11 +56,11 @@ class FoodItemServiceInMemory implements IFoodItemService {
       name: 'Broccoli',
       category: 'Produce',
       subcategory: 'Produce',
-      expirationDate: DateTime.now().add(const Duration(days: 5)),
+      useByDate: DateTime.now().add(const Duration(days: 5)),
       statusColor: Colors.green,
       icon: Icons.eco,
       iconBackgroundColor: const Color(0xFFE5F5E5),
-      purchaseDate: DateTime.now().subtract(const Duration(days: 2)),
+      openDate: DateTime.now().subtract(const Duration(days: 2)),
       quantity: 1,
       quantityUnit: 'bunch',
     ),
@@ -68,11 +68,11 @@ class FoodItemServiceInMemory implements IFoodItemService {
       name: 'Yogurt',
       category: 'Dairy',
       subcategory: 'Dairy',
-      expirationDate: DateTime.now().add(const Duration(days: 7)),
+      useByDate: DateTime.now().add(const Duration(days: 7)),
       statusColor: Colors.green,
       icon: Icons.lunch_dining,
       iconBackgroundColor: const Color(0xFFE5F5E5),
-      purchaseDate: DateTime.now().subtract(const Duration(days: 1)),
+      openDate: DateTime.now().subtract(const Duration(days: 1)),
       quantity: 1,
       quantityUnit: 'container',
     ),
@@ -98,7 +98,7 @@ class FoodItemServiceInMemory implements IFoodItemService {
         final now = DateTime.now();
         final threeDaysFromNow = now.add(const Duration(days: 3));
         items = items.where((item) {
-          final expirationMs = item.expirationDate.millisecondsSinceEpoch;
+          final expirationMs = item.useByDate.millisecondsSinceEpoch;
           final nowMs = now.millisecondsSinceEpoch;
           final threeDaysMs = threeDaysFromNow.millisecondsSinceEpoch;
           return expirationMs >= nowMs && expirationMs <= threeDaysMs;
@@ -152,8 +152,8 @@ class FoodItemServiceInMemory implements IFoodItemService {
     return a.name == b.name &&
         a.category == b.category &&
         a.subcategory == b.subcategory &&
-        a.expirationDate.millisecondsSinceEpoch ==
-            b.expirationDate.millisecondsSinceEpoch;
+        a.useByDate.millisecondsSinceEpoch ==
+            b.useByDate.millisecondsSinceEpoch;
   }
 
   // Update a food item

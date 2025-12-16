@@ -4,6 +4,7 @@ import 'package:openfoodfacts/openfoodfacts.dart';
 import '../../shared/models/food_item.dart';
 import '../../shared/services/i_food_item_service.dart';
 import '../../shared/services/food_item_service_factory.dart';
+import '../../shared/widgets/info_dialog.dart';
 
 class AddItemScreen extends StatefulWidget {
   final Product? product;
@@ -17,22 +18,21 @@ class AddItemScreen extends StatefulWidget {
 class _AddItemScreenState extends State<AddItemScreen> {
   final IFoodItemService _foodItemService = FoodItemServiceFactory.getService();
   final TextEditingController _itemNameController = TextEditingController();
-  final TextEditingController _purchaseDateController = TextEditingController();
-  final TextEditingController _expirationDateController =
-      TextEditingController();
+  final TextEditingController _openDateController = TextEditingController();
+  final TextEditingController _useByDateController = TextEditingController();
 
   String? _selectedCategory;
   int _quantity = 1;
-  late DateTime _purchaseDate;
-  DateTime? _expirationDate;
+  late DateTime _openDate;
+  DateTime? _useByDate;
 
   @override
   void initState() {
     super.initState();
-    // Set purchase date to today by default
-    _purchaseDate = DateTime.now();
-    _purchaseDateController.text =
-        '${_purchaseDate.day.toString().padLeft(2, '0')}/${_purchaseDate.month.toString().padLeft(2, '0')}/${_purchaseDate.year}';
+    // Set open date to today by default
+    _openDate = DateTime.now();
+    _openDateController.text =
+        '${_openDate.day.toString().padLeft(2, '0')}/${_openDate.month.toString().padLeft(2, '0')}/${_openDate.year}';
 
     // Populate form with product data if available
     if (widget.product != null) {
@@ -52,25 +52,25 @@ class _AddItemScreenState extends State<AddItemScreen> {
         product.categories!,
       );
       _selectedCategory = category;
-      // Set estimated expiration date based on category
+      // Set estimated use by date based on category
       if (category != null) {
-        _setEstimatedExpirationDate(category);
+        _setEstimatedUseByDate(category);
       }
     }
 
     // Quantity is always 1 (not extracted from product)
   }
 
-  void _setEstimatedExpirationDate(String category) {
-    final estimatedDate = _getEstimatedExpirationDate(category);
+  void _setEstimatedUseByDate(String category) {
+    final estimatedDate = _getEstimatedUseByDate(category);
     setState(() {
-      _expirationDate = estimatedDate;
-      _expirationDateController.text =
+      _useByDate = estimatedDate;
+      _useByDateController.text =
           '${estimatedDate.day.toString().padLeft(2, '0')}/${estimatedDate.month.toString().padLeft(2, '0')}/${estimatedDate.year}';
     });
   }
 
-  DateTime _getEstimatedExpirationDate(String category) {
+  DateTime _getEstimatedUseByDate(String category) {
     final now = DateTime.now();
 
     // Estimates are based on opened products (shorter shelf life than unopened)
@@ -154,39 +154,38 @@ class _AddItemScreenState extends State<AddItemScreen> {
   @override
   void dispose() {
     _itemNameController.dispose();
-    _purchaseDateController.dispose();
-    _expirationDateController.dispose();
+    _openDateController.dispose();
+    _useByDateController.dispose();
     super.dispose();
   }
 
-  Future<void> _selectPurchaseDate() async {
+  Future<void> _selectOpenDate() async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: _purchaseDate,
+      initialDate: _openDate,
       firstDate: DateTime(2020),
       lastDate: DateTime.now(),
     );
     if (picked != null) {
       setState(() {
-        _purchaseDate = picked;
-        _purchaseDateController.text =
+        _openDate = picked;
+        _openDateController.text =
             '${picked.day.toString().padLeft(2, '0')}/${picked.month.toString().padLeft(2, '0')}/${picked.year}';
       });
     }
   }
 
-  Future<void> _selectExpirationDate() async {
+  Future<void> _selectUseByDate() async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate:
-          _expirationDate ?? DateTime.now().add(const Duration(days: 7)),
+      initialDate: _useByDate ?? DateTime.now().add(const Duration(days: 7)),
       firstDate: DateTime.now(),
       lastDate: DateTime.now().add(const Duration(days: 365)),
     );
     if (picked != null) {
       setState(() {
-        _expirationDate = picked;
-        _expirationDateController.text =
+        _useByDate = picked;
+        _useByDateController.text =
             '${picked.day.toString().padLeft(2, '0')}/${picked.month.toString().padLeft(2, '0')}/${picked.year}';
       });
     }
@@ -206,8 +205,8 @@ class _AddItemScreenState extends State<AddItemScreen> {
     }
   }
 
-  Color _getStatusColor(DateTime expirationDate) {
-    final days = expirationDate.difference(DateTime.now()).inDays;
+  Color _getStatusColor(DateTime useByDate) {
+    final days = useByDate.difference(DateTime.now()).inDays;
     if (days < 0) return Colors.red;
     if (days <= 3) return Colors.orange;
     return Colors.green;
@@ -264,14 +263,14 @@ class _AddItemScreenState extends State<AddItemScreen> {
       ).showSnackBar(const SnackBar(content: Text('Please select a category')));
       return;
     }
-    if (_expirationDate == null) {
+    if (_useByDate == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select an expiration date')),
+        const SnackBar(content: Text('Please select a use by date')),
       );
       return;
     }
 
-    final statusColor = _getStatusColor(_expirationDate!);
+    final statusColor = _getStatusColor(_useByDate!);
     final icon = _getIconForCategory(_selectedCategory!);
     final iconBackgroundColor = _getIconBackgroundColor(_selectedCategory!);
 
@@ -279,11 +278,11 @@ class _AddItemScreenState extends State<AddItemScreen> {
       name: _itemNameController.text.trim(),
       category: _selectedCategory!,
       subcategory: _selectedCategory!,
-      expirationDate: _expirationDate!,
+      useByDate: _useByDate!,
       statusColor: statusColor,
       icon: icon,
       iconBackgroundColor: iconBackgroundColor,
-      purchaseDate: _purchaseDate, // Now always required
+      openDate: _openDate, // Now always required
       quantity: _quantity,
       quantityUnit: 'unit', // Now always required
     );
@@ -412,9 +411,9 @@ class _AddItemScreenState extends State<AddItemScreen> {
                           setState(() {
                             _selectedCategory = value;
                           });
-                          // Set estimated expiration date based on selected category
+                          // Set estimated use by date based on selected category
                           if (value != null) {
-                            _setEstimatedExpirationDate(value);
+                            _setEstimatedUseByDate(value);
                           }
                         },
                       ),
@@ -491,20 +490,38 @@ class _AddItemScreenState extends State<AddItemScreen> {
 
                     const SizedBox(height: 24),
 
-                    // Purchase Date
-                    const Text(
-                      'Purchase Date',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF2C2C2C),
-                      ),
+                    // Open Date
+                    Row(
+                      children: [
+                        const Text(
+                          'Open Date',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF2C2C2C),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        GestureDetector(
+                          onTap: () => InfoDialog.show(
+                            context: context,
+                            title: 'Open Date',
+                            message:
+                                'The date when the item was opened or put in the fridge',
+                          ),
+                          child: Icon(
+                            Icons.info_outline,
+                            size: 18,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 8),
                     TextField(
-                      controller: _purchaseDateController,
+                      controller: _openDateController,
                       readOnly: true,
-                      onTap: _selectPurchaseDate,
+                      onTap: _selectOpenDate,
                       decoration: InputDecoration(
                         hintText: 'dd/mm/yyyy',
                         filled: true,
@@ -526,20 +543,38 @@ class _AddItemScreenState extends State<AddItemScreen> {
 
                     const SizedBox(height: 24),
 
-                    // Expiration Date
-                    const Text(
-                      'Expiration Date',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF2C2C2C),
-                      ),
+                    // Use By Date
+                    Row(
+                      children: [
+                        const Text(
+                          'Use By Date',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF2C2C2C),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        GestureDetector(
+                          onTap: () => InfoDialog.show(
+                            context: context,
+                            title: 'Use By Date',
+                            message:
+                                'The maximum date the item should be consumed after opening',
+                          ),
+                          child: Icon(
+                            Icons.info_outline,
+                            size: 18,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 8),
                     TextField(
-                      controller: _expirationDateController,
+                      controller: _useByDateController,
                       readOnly: true,
-                      onTap: _selectExpirationDate,
+                      onTap: _selectUseByDate,
                       decoration: InputDecoration(
                         hintText: 'dd/mm/yyyy',
                         filled: true,

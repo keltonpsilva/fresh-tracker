@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../shared/models/food_item.dart';
 import '../../shared/services/i_food_item_service.dart';
 import '../../shared/services/food_item_service_factory.dart';
+import '../../shared/widgets/info_dialog.dart';
 import '../edit_item/edit_item_screen.dart';
 
 class ItemDetailsScreen extends StatelessWidget {
@@ -32,9 +33,9 @@ class ItemDetailsScreen extends StatelessWidget {
 
   double _getFreshnessProgress() {
     final now = DateTime.now();
-    final purchaseDate = item.purchaseDate;
-    final totalDays = item.expirationDate.difference(purchaseDate).inDays;
-    final remainingDays = item.expirationDate.difference(now).inDays;
+    final openDate = item.openDate;
+    final totalDays = item.useByDate.difference(openDate).inDays;
+    final remainingDays = item.useByDate.difference(now).inDays;
 
     if (totalDays <= 0) return 0.0;
     if (remainingDays <= 0) return 0.0;
@@ -43,7 +44,7 @@ class ItemDetailsScreen extends StatelessWidget {
   }
 
   Color _getFreshnessColor() {
-    final days = item.expirationDate.difference(DateTime.now()).inDays;
+    final days = item.useByDate.difference(DateTime.now()).inDays;
     if (days <= 1) return Colors.red;
     if (days <= 3) return Colors.orange;
     return Colors.green;
@@ -55,10 +56,10 @@ class ItemDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final purchaseDate = item.purchaseDate;
+    final openDate = item.openDate;
     final freshnessProgress = _getFreshnessProgress();
     final freshnessColor = _getFreshnessColor();
-    final daysRemaining = item.expirationDate.difference(DateTime.now()).inDays;
+    final daysRemaining = item.useByDate.difference(DateTime.now()).inDays;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -169,14 +170,14 @@ class ItemDetailsScreen extends StatelessWidget {
                         const SizedBox(height: 16),
                         _buildDetailRow(
                           icon: Icons.calendar_today,
-                          label: 'Added On',
-                          value: _formatDate(purchaseDate),
+                          label: 'Open Date',
+                          value: _formatDate(openDate),
                         ),
                         const SizedBox(height: 16),
                         _buildDetailRow(
                           icon: Icons.event_busy,
                           label: 'Use By',
-                          value: _formatDate(item.expirationDate),
+                          value: _formatDate(item.useByDate),
                           isBold: true,
                         ),
                       ],
@@ -315,38 +316,21 @@ class ItemDetailsScreen extends StatelessWidget {
                   child: IconButton(
                     icon: const Icon(Icons.delete, color: Colors.white),
                     onPressed: () {
-                      showDialog(
+                      InfoDialog.showConfirmation(
                         context: context,
-                        builder: (context) => AlertDialog(
-                          title: const Text('Delete Item'),
-                          content: const Text(
-                            'Are you sure you want to delete this item?',
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.of(context).pop(),
-                              child: const Text('Cancel'),
-                            ),
-                            TextButton(
-                              onPressed: () async {
-                                Navigator.of(context).pop();
-                                await _foodItemService.removeItem(item);
-                                if (context.mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text('Item deleted'),
-                                    ),
-                                  );
-                                  Navigator.of(context).pop();
-                                }
-                              },
-                              child: const Text(
-                                'Delete',
-                                style: TextStyle(color: Colors.red),
-                              ),
-                            ),
-                          ],
-                        ),
+                        title: 'Delete Item',
+                        message: 'Are you sure you want to delete this item?',
+                        confirmText: 'Delete',
+                        cancelText: 'Cancel',
+                        onConfirm: () async {
+                          await _foodItemService.removeItem(item);
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Item deleted')),
+                            );
+                            Navigator.of(context).pop();
+                          }
+                        },
                       );
                     },
                   ),

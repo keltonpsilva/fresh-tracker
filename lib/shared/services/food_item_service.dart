@@ -35,11 +35,11 @@ class FoodItemService implements IFoodItemService {
       name: 'Organic Eggs',
       category: 'Dairy',
       subcategory: 'Dairy & Eggs',
-      expirationDate: DateTime.now().subtract(const Duration(days: 1)),
+      useByDate: DateTime.now().subtract(const Duration(days: 1)),
       statusColor: Colors.red,
       icon: Icons.egg,
       iconBackgroundColor: const Color(0xFFFFE5E5),
-      purchaseDate: DateTime.now().subtract(const Duration(days: 8)),
+      openDate: DateTime.now().subtract(const Duration(days: 8)),
       quantity: 1,
       quantityUnit: 'dozen',
     ),
@@ -47,11 +47,11 @@ class FoodItemService implements IFoodItemService {
       name: 'Milk',
       category: 'Dairy',
       subcategory: 'Dairy',
-      expirationDate: DateTime.now().add(const Duration(days: 1)),
+      useByDate: DateTime.now().add(const Duration(days: 1)),
       statusColor: Colors.orange,
       icon: Icons.water_drop,
       iconBackgroundColor: const Color(0xFFFFF4E5),
-      purchaseDate: DateTime.now().subtract(const Duration(days: 6)),
+      openDate: DateTime.now().subtract(const Duration(days: 6)),
       quantity: 1,
       quantityUnit: 'Gallon',
       notes: 'Opened recently. Keep in the main compartment, not the door.',
@@ -60,11 +60,11 @@ class FoodItemService implements IFoodItemService {
       name: 'Chicken Breast',
       category: 'Meat',
       subcategory: 'Meat',
-      expirationDate: DateTime.now().add(const Duration(days: 3)),
+      useByDate: DateTime.now().add(const Duration(days: 3)),
       statusColor: Colors.green,
       icon: Icons.restaurant,
       iconBackgroundColor: const Color(0xFFE5F5E5),
-      purchaseDate: DateTime.now().subtract(const Duration(days: 2)),
+      openDate: DateTime.now().subtract(const Duration(days: 2)),
       quantity: 2,
       quantityUnit: 'lbs',
     ),
@@ -72,11 +72,11 @@ class FoodItemService implements IFoodItemService {
       name: 'Broccoli',
       category: 'Produce',
       subcategory: 'Produce',
-      expirationDate: DateTime.now().add(const Duration(days: 5)),
+      useByDate: DateTime.now().add(const Duration(days: 5)),
       statusColor: Colors.green,
       icon: Icons.eco,
       iconBackgroundColor: const Color(0xFFE5F5E5),
-      purchaseDate: DateTime.now().subtract(const Duration(days: 2)),
+      openDate: DateTime.now().subtract(const Duration(days: 2)),
       quantity: 1,
       quantityUnit: 'bunch',
     ),
@@ -84,11 +84,11 @@ class FoodItemService implements IFoodItemService {
       name: 'Yogurt',
       category: 'Dairy',
       subcategory: 'Dairy',
-      expirationDate: DateTime.now().add(const Duration(days: 7)),
+      useByDate: DateTime.now().add(const Duration(days: 7)),
       statusColor: Colors.green,
       icon: Icons.lunch_dining,
       iconBackgroundColor: const Color(0xFFE5F5E5),
-      purchaseDate: DateTime.now().subtract(const Duration(days: 1)),
+      openDate: DateTime.now().subtract(const Duration(days: 1)),
       quantity: 1,
       quantityUnit: 'container',
     ),
@@ -123,11 +123,11 @@ class FoodItemService implements IFoodItemService {
           name TEXT NOT NULL,
           category TEXT NOT NULL,
           subcategory TEXT NOT NULL,
-          expiration_date INTEGER NOT NULL,
+          use_by_date INTEGER NOT NULL,
           status_color INTEGER NOT NULL,
           icon_code_point INTEGER NOT NULL,
           icon_background_color INTEGER NOT NULL,
-          purchase_date INTEGER,
+          open_date INTEGER,
           quantity INTEGER,
           quantity_unit TEXT,
           notes TEXT
@@ -142,11 +142,11 @@ class FoodItemService implements IFoodItemService {
       'name': item.name,
       'category': item.category,
       'subcategory': item.subcategory,
-      'expiration_date': item.expirationDate.millisecondsSinceEpoch,
+      'use_by_date': item.useByDate.millisecondsSinceEpoch,
       'status_color': item.statusColor.toARGB32(),
       'icon_code_point': item.icon.codePoint,
       'icon_background_color': item.iconBackgroundColor.toARGB32(),
-      'purchase_date': item.purchaseDate.millisecondsSinceEpoch,
+      'open_date': item.openDate.millisecondsSinceEpoch,
       'quantity': item.quantity,
       'quantity_unit': item.quantityUnit,
       'notes': item.notes,
@@ -163,9 +163,7 @@ class FoodItemService implements IFoodItemService {
       name: map['name'] as String,
       category: map['category'] as String,
       subcategory: map['subcategory'] as String,
-      expirationDate: DateTime.fromMillisecondsSinceEpoch(
-        map['expiration_date'] as int,
-      ),
+      useByDate: DateTime.fromMillisecondsSinceEpoch(map['use_by_date'] as int),
       statusColor: Color(map['status_color'] as int),
 
       /// SAFE icon lookup
@@ -173,10 +171,10 @@ class FoodItemService implements IFoodItemService {
 
       iconBackgroundColor: Color(map['icon_background_color'] as int),
 
-      purchaseDate: map['purchase_date'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(map['purchase_date'] as int)
+      openDate: map['open_date'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(map['open_date'] as int)
           : DateTime.fromMillisecondsSinceEpoch(
-              map['expiration_date'] as int,
+              map['use_by_date'] as int,
             ).subtract(const Duration(days: 7)),
 
       quantity: map['quantity'] ?? 1,
@@ -206,7 +204,7 @@ class FoodItemService implements IFoodItemService {
         final threeDaysFromNow = now.add(const Duration(days: 3));
         maps = await db.query(
           _tableName,
-          where: 'expiration_date >= ? AND expiration_date <= ?',
+          where: 'use_by_date >= ? AND use_by_date <= ?',
           whereArgs: [
             now.millisecondsSinceEpoch,
             threeDaysFromNow.millisecondsSinceEpoch,
@@ -270,8 +268,8 @@ class FoodItemService implements IFoodItemService {
     return a.name == b.name &&
         a.category == b.category &&
         a.subcategory == b.subcategory &&
-        a.expirationDate.millisecondsSinceEpoch ==
-            b.expirationDate.millisecondsSinceEpoch;
+        a.useByDate.millisecondsSinceEpoch ==
+            b.useByDate.millisecondsSinceEpoch;
   }
 
   @override
