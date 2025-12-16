@@ -118,6 +118,7 @@ jobs:
   create-tag:
     needs: [generate-version, build-android, build-web]
     uses: ./.github/workflows/create-tag.yaml
+    if: github.event_name == 'push' && ((github.ref == 'refs/heads/main') || startsWith(github.ref_name, 'release'))
     with:
       version: ${{ needs.generate-version.outputs.version }}
 
