@@ -1,7 +1,7 @@
-import 'dart:io';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart'
+    show defaultTargetPlatform, TargetPlatform;
 
 import '../add_item/add_item_screen.dart';
 import '../item_details/item_details_screen.dart';
@@ -10,6 +10,7 @@ import '../edit_item/edit_item_screen.dart';
 import '../../shared/models/food_item.dart';
 import '../../shared/services/i_food_item_service.dart';
 import '../../shared/services/food_item_service_factory.dart';
+import '../../shared/widgets/info_dialog.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -56,7 +57,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void _showActionMenu(FoodItem item) {
     // This method is only called on iOS
     // Android uses PopupMenuButton directly which handles its own menu
-    if (Platform.isIOS) {
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
       _showIOSActionSheet(item);
     }
   }
@@ -106,28 +107,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   void _showDeleteConfirmation(FoodItem item) {
-    showDialog(
+    InfoDialog.showConfirmation(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete Item'),
-        content: Text(
+      title: 'Delete Item',
+      message:
           'Are you sure you want to delete "${item.name}"? This action cannot be undone.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.of(context).pop();
-              await _deleteItem(item);
-            },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      onConfirm: () async {
+        await _deleteItem(item);
+      },
     );
   }
 
@@ -590,7 +579,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
 
             // More options icon - Platform specific
-            Platform.isIOS
+            defaultTargetPlatform == TargetPlatform.iOS
                 ? IconButton(
                     icon: const Icon(Icons.more_vert, color: Colors.grey),
                     onPressed: () => _showActionMenu(item),

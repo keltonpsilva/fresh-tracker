@@ -4,11 +4,11 @@ class FoodItem {
   final String name;
   final String category;
   final String subcategory;
-  final DateTime expirationDate;
+  final DateTime useByDate;
   final Color statusColor;
   final IconData icon;
   final Color iconBackgroundColor;
-  final DateTime purchaseDate;
+  final DateTime openDate;
   final int quantity;
   final String quantityUnit;
   final String? notes;
@@ -17,11 +17,11 @@ class FoodItem {
     required this.name,
     required this.category,
     required this.subcategory,
-    required this.expirationDate,
+    required this.useByDate,
     required this.statusColor,
     required this.icon,
     required this.iconBackgroundColor,
-    required this.purchaseDate,
+    required this.openDate,
     required this.quantity,
     required this.quantityUnit,
     this.notes,
@@ -29,7 +29,7 @@ class FoodItem {
 
   String get expirationStatus {
     final now = DateTime.now();
-    final difference = expirationDate.difference(now).inDays;
+    final difference = useByDate.difference(now).inDays;
 
     if (difference < 0) {
       if (difference == -1) {
@@ -45,4 +45,3 @@ class FoodItem {
     }
   }
 }
-
