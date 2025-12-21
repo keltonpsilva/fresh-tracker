@@ -224,6 +224,15 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               ),
               child: Row(
                 children: [
+                  IconButton(
+                    icon: const Icon(
+                      Icons.chevron_left,
+                      color: Color(0xFF2C2C2C),
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
                   const Expanded(
                     child: Text(
                       'Notifications',
