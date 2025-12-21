@@ -38,13 +38,13 @@ class NotificationItemCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Orange status bar
+          // Status bar
           Container(
             width: 4,
             height: 100,
-            decoration: const BoxDecoration(
-              color: Colors.orange,
-              borderRadius: BorderRadius.only(
+            decoration: BoxDecoration(
+              color: item.statusColor,
+              borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(12),
                 bottomLeft: Radius.circular(12),
               ),
