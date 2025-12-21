@@ -4,7 +4,6 @@ import '../models/food_item.dart';
 class NotificationItemCard extends StatelessWidget {
   final FoodItem item;
   final String storageLocation;
-  final IconData storageIcon;
   final VoidCallback onMarkAsConsumed;
   final VoidCallback onDelete;
   final VoidCallback? onTap;
@@ -13,11 +12,14 @@ class NotificationItemCard extends StatelessWidget {
     super.key,
     required this.item,
     required this.storageLocation,
-    required this.storageIcon,
     required this.onMarkAsConsumed,
     required this.onDelete,
     this.onTap,
   });
+
+  IconData _getStorageIcon() {
+    return storageLocation == 'Fridge' ? Icons.ac_unit : Icons.countertops;
+  }
 
   String _getExpirationText() {
     final now = DateTime.now();
@@ -126,7 +128,7 @@ class NotificationItemCard extends StatelessWidget {
                           Row(
                             children: [
                               Icon(
-                                storageIcon,
+                                _getStorageIcon(),
                                 size: 16,
                                 color: Colors.grey[600],
                               ),

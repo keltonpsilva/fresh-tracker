@@ -113,11 +113,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     }
   }
 
-  IconData _getStorageIcon(FoodItem item) {
-    final location = _getStorageLocation(item);
-    return location == 'Fridge' ? Icons.ac_unit : Icons.countertops;
-  }
-
   Future<void> _markAsConsumed(FoodItem item) async {
     try {
       await _foodItemService.removeItem(item);
@@ -355,7 +350,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               (item) => NotificationItemCard(
                 item: item,
                 storageLocation: _getStorageLocation(item),
-                storageIcon: _getStorageIcon(item),
                 onMarkAsConsumed: () => _markAsConsumed(item),
                 onDelete: () => _deleteItem(item),
                 onTap: () {
@@ -383,7 +377,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               (item) => NotificationItemCard(
                 item: item,
                 storageLocation: _getStorageLocation(item),
-                storageIcon: _getStorageIcon(item),
                 onMarkAsConsumed: () => _markAsConsumed(item),
                 onDelete: () => _deleteItem(item),
                 onTap: () {
@@ -451,7 +444,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             (item) => NotificationItemCard(
               item: item,
               storageLocation: _getStorageLocation(item),
-              storageIcon: _getStorageIcon(item),
               onMarkAsConsumed: () => _markAsConsumed(item),
               onDelete: () => _deleteItem(item),
               onTap: () {
