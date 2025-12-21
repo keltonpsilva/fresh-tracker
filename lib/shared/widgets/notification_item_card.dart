@@ -93,9 +93,9 @@ class NotificationItemCard extends StatelessWidget {
                           const SizedBox(height: 4),
                           Text(
                             expirationText,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 14,
-                              color: Colors.orange,
+                              color: item.statusColor,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
