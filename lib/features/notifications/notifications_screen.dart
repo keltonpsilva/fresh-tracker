@@ -205,33 +205,50 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
             // Tab Navigation
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 12.0,
+              ),
               child: Container(
+                height: 40,
                 decoration: BoxDecoration(
-                  color: Colors.grey[200],
+                  color: const Color(0xFFE5E5E5).withOpacity(0.8),
                   borderRadius: BorderRadius.circular(8),
                 ),
+                padding: const EdgeInsets.all(4),
                 child: Row(
                   children: [
                     Expanded(
                       child: GestureDetector(
                         onTap: () => setState(() => _selectedTab = 0),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          height: double.infinity,
                           decoration: BoxDecoration(
                             color: _selectedTab == 0
                                 ? Colors.white
                                 : Colors.transparent,
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(6),
+                            boxShadow: _selectedTab == 0
+                                ? [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.05),
+                                      blurRadius: 2,
+                                      offset: const Offset(0, 1),
+                                    ),
+                                  ]
+                                : null,
                           ),
-                          child: const Text(
-                            'Upcoming',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF2C2C2C),
+                          child: Center(
+                            child: Text(
+                              'Upcoming',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: _selectedTab == 0
+                                    ? const Color(0xFF2C2C2C)
+                                    : const Color(0xFF757575),
+                              ),
                             ),
-                            textAlign: TextAlign.center,
                           ),
                         ),
                       ),
@@ -240,23 +257,33 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                       child: GestureDetector(
                         onTap: () => setState(() => _selectedTab = 1),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          height: double.infinity,
                           decoration: BoxDecoration(
                             color: _selectedTab == 1
                                 ? Colors.white
                                 : Colors.transparent,
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(6),
+                            boxShadow: _selectedTab == 1
+                                ? [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.05),
+                                      blurRadius: 2,
+                                      offset: const Offset(0, 1),
+                                    ),
+                                  ]
+                                : null,
                           ),
-                          child: Text(
-                            'Expired',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: _selectedTab == 1
-                                  ? const Color(0xFF2C2C2C)
-                                  : Colors.grey[600],
+                          child: Center(
+                            child: Text(
+                              'Expired',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: _selectedTab == 1
+                                    ? const Color(0xFF2C2C2C)
+                                    : const Color(0xFF757575),
+                              ),
                             ),
-                            textAlign: TextAlign.center,
                           ),
                         ),
                       ),
@@ -265,8 +292,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 ),
               ),
             ),
-
-            const SizedBox(height: 16),
 
             // Search Bar
             Padding(
