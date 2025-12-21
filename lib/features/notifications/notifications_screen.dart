@@ -4,6 +4,7 @@ import '../../shared/services/i_food_item_service.dart';
 import '../../shared/services/food_item_service_factory.dart';
 import '../../shared/widgets/info_dialog.dart';
 import '../../shared/widgets/notification_item_card.dart';
+import '../item_details/item_details_screen.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -226,19 +227,14 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               child: Row(
                 children: [
                   IconButton(
-                    icon: const Icon(
-                      Icons.chevron_left,
-                      color: Color(0xFF2C2C2C),
-                    ),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
+                    icon: const Icon(Icons.close, color: Color(0xFF2C2C2C)),
+                    onPressed: () => Navigator.of(context).pop(),
                   ),
                   const Expanded(
                     child: Text(
                       'Notifications',
                       style: TextStyle(
-                        fontSize: 24,
+                        fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF2C2C2C),
                       ),
@@ -388,6 +384,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 storageIcon: _getStorageIcon(item),
                 onMarkAsConsumed: () => _markAsConsumed(item),
                 onDelete: () => _deleteItem(item),
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => ItemDetailsScreen(item: item),
+                    ),
+                  );
+                },
               ),
             ),
             const SizedBox(height: 24),
@@ -410,6 +413,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 storageIcon: _getStorageIcon(item),
                 onMarkAsConsumed: () => _markAsConsumed(item),
                 onDelete: () => _deleteItem(item),
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => ItemDetailsScreen(item: item),
+                    ),
+                  );
+                },
               ),
             ),
             const SizedBox(height: 24),
@@ -472,6 +482,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               storageIcon: _getStorageIcon(item),
               onMarkAsConsumed: () => _markAsConsumed(item),
               onDelete: () => _deleteItem(item),
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => ItemDetailsScreen(item: item),
+                  ),
+                );
+              },
             ),
           ),
           const SizedBox(height: 24),

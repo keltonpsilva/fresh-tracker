@@ -8,6 +8,7 @@ class NotificationItemCard extends StatelessWidget {
   final IconData storageIcon;
   final VoidCallback onMarkAsConsumed;
   final VoidCallback onDelete;
+  final VoidCallback? onTap;
 
   const NotificationItemCard({
     super.key,
@@ -17,6 +18,7 @@ class NotificationItemCard extends StatelessWidget {
     required this.storageIcon,
     required this.onMarkAsConsumed,
     required this.onDelete,
+    this.onTap,
   });
 
   @override
@@ -49,54 +51,75 @@ class NotificationItemCard extends StatelessWidget {
             ),
           ),
 
-          // Item image/icon
-          Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Container(
-              width: 56,
-              height: 56,
-              decoration: BoxDecoration(
-                color: item.iconBackgroundColor,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(item.icon, color: item.statusColor, size: 28),
-            ),
-          ),
-
-          // Item details
+          // Tappable main content area
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            child: InkWell(
+              onTap: onTap,
+              borderRadius: const BorderRadius.only(
+                topRight: Radius.circular(12),
+                bottomRight: Radius.circular(12),
+              ),
+              child: Row(
                 children: [
-                  Text(
-                    item.name,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF2C2C2C),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    expirationText,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Colors.orange,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Icon(storageIcon, size: 16, color: Colors.grey[600]),
-                      const SizedBox(width: 4),
-                      Text(
-                        storageLocation,
-                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  // Item image/icon
+                  Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Container(
+                      width: 56,
+                      height: 56,
+                      decoration: BoxDecoration(
+                        color: item.iconBackgroundColor,
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                    ],
+                      child: Icon(item.icon, color: item.statusColor, size: 28),
+                    ),
+                  ),
+
+                  // Item details
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            item.name,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF2C2C2C),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            expirationText,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.orange,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              Icon(
+                                storageIcon,
+                                size: 16,
+                                color: Colors.grey[600],
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                storageLocation,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -152,4 +175,3 @@ class NotificationItemCard extends StatelessWidget {
     );
   }
 }
-
