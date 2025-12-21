@@ -2,10 +2,62 @@ import 'package:flutter/material.dart';
 import '../dashboard/dashboard_screen.dart';
 import '../../shared/services/app_preferences_service.dart';
 
-class OnboardScreen extends StatelessWidget {
+class OnboardingSlide {
+  final String title;
+  final String subtitle;
+
+  const OnboardingSlide({required this.title, required this.subtitle});
+}
+
+class OnboardScreen extends StatefulWidget {
   const OnboardScreen({super.key});
 
-  Future<void> _onGetStartedPressed(BuildContext context) async {
+  @override
+  State<OnboardScreen> createState() => _OnboardScreenState();
+}
+
+class _OnboardScreenState extends State<OnboardScreen> {
+  final PageController _pageController = PageController();
+  int _currentPage = 0;
+
+  final List<OnboardingSlide> _slides = const [
+    OnboardingSlide(
+      title: 'Waste Less, Save More',
+      subtitle:
+          'Easily track food in your fridge, reduce waste, and manage your kitchen inventory.',
+    ),
+    OnboardingSlide(
+      title: 'Smart Expiration Tracking',
+      subtitle:
+          'Get timely notifications about expiring items and never let food go to waste again.',
+    ),
+    OnboardingSlide(
+      title: 'Plan Meals, Save Money',
+      subtitle:
+          'Create meal plans based on what you have, reduce grocery trips, and save on your food budget.',
+    ),
+  ];
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _onGetStartedPressed(BuildContext context) {
+    if (_currentPage < _slides.length - 1) {
+      // Navigate to next slide
+      _pageController.nextPage(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    } else {
+      // Last slide - finish onboarding
+      _finishOnboarding(context);
+    }
+  }
+
+  Future<void> _finishOnboarding(BuildContext context) async {
     // Mark first launch as complete
     await AppPreferencesService.setFirstLaunchComplete();
 
@@ -17,72 +69,88 @@ class OnboardScreen extends StatelessWidget {
   }
 
   void _onSignInPressed(BuildContext context) {
-    // Navigate to sign in (for now, same as get started)
-    _onGetStartedPressed(context);
+    // Navigate to sign in (for now, same as finish onboarding)
+    _finishOnboarding(context);
   }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     return Scaffold(
-      backgroundColor: isDark 
-          ? const Color(0xFF102212) 
+      backgroundColor: isDark
+          ? const Color(0xFF102212)
           : const Color(0xFFF6F8F6),
       body: SafeArea(
         child: Column(
           children: [
-            // Main content area
+            // Main content area with PageView
             Expanded(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 20),
-                      
-                      // Refrigerator Illustration
-                      _buildRefrigeratorIllustration(),
-                      
-                      const SizedBox(height: 24),
-                      
-                      // Headline
-                      const Text(
-                        'Waste Less, Save More',
-                        style: TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF333333),
-                          letterSpacing: -0.5,
-                          height: 1.2,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      
-                      const SizedBox(height: 12),
-                      
-                      // Body Text
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Text(
-                          'Easily track food in your fridge, reduce waste, and manage your kitchen inventory.',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.normal,
-                            color: isDark 
-                                ? Colors.grey[300] 
-                                : const Color(0xFF888888),
-                            height: 1.5,
+              child: PageView.builder(
+                controller: _pageController,
+                onPageChanged: (index) {
+                  setState(() {
+                    _currentPage = index;
+                  });
+                },
+                itemCount: _slides.length,
+                itemBuilder: (context, index) {
+                  final slide = _slides[index];
+                  return SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 20),
+
+                          // Refrigerator Illustration
+                          _buildRefrigeratorIllustration(),
+
+                          const SizedBox(height: 24),
+
+                          // Headline
+                          Text(
+                            slide.title,
+                            style: TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.bold,
+                              color: isDark
+                                  ? Colors.white
+                                  : const Color(0xFF333333),
+                              letterSpacing: -0.5,
+                              height: 1.2,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
-                          textAlign: TextAlign.center,
-                        ),
+
+                          const SizedBox(height: 12),
+
+                          // Body Text
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16.0,
+                            ),
+                            child: Text(
+                              slide.subtitle,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.normal,
+                                color: isDark
+                                    ? Colors.grey[300]
+                                    : const Color(0xFF888888),
+                                height: 1.5,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
+                    ),
+                  );
+                },
               ),
             ),
-            
+
             // Bottom section with indicators and buttons
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -91,18 +159,20 @@ class OnboardScreen extends StatelessWidget {
                   // Page Indicators
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _buildPageIndicator(isActive: true),
-                      const SizedBox(width: 12),
-                      _buildPageIndicator(isActive: false),
-                      const SizedBox(width: 12),
-                      _buildPageIndicator(isActive: false),
-                    ],
+                    children: List.generate(
+                      _slides.length,
+                      (index) => Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 6.0),
+                        child: _buildPageIndicator(
+                          isActive: index == _currentPage,
+                        ),
+                      ),
+                    ),
                   ),
-                  
+
                   const SizedBox(height: 20),
-                  
-                  // Get Started Button
+
+                  // Get Started / Next Button
                   SizedBox(
                     width: double.infinity,
                     height: 48,
@@ -116,9 +186,11 @@ class OnboardScreen extends StatelessWidget {
                         ),
                         elevation: 0,
                       ),
-                      child: const Text(
-                        'Get Started',
-                        style: TextStyle(
+                      child: Text(
+                        _currentPage < _slides.length - 1
+                            ? 'Next'
+                            : 'Get Started',
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                           letterSpacing: 0.015,
@@ -126,9 +198,9 @@ class OnboardScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  
+
                   const SizedBox(height: 8),
-                  
+
                   // Sign In Button
                   TextButton(
                     onPressed: () => _onSignInPressed(context),
@@ -143,13 +215,13 @@ class OnboardScreen extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
-                        color: isDark 
-                            ? Colors.grey[300] 
+                        color: isDark
+                            ? Colors.grey[300]
                             : const Color(0xFF888888),
                       ),
                     ),
                   ),
-                  
+
                   const SizedBox(height: 24),
                 ],
               ),
@@ -163,10 +235,7 @@ class OnboardScreen extends StatelessWidget {
   Widget _buildRefrigeratorIllustration() {
     return Container(
       width: double.infinity,
-      constraints: const BoxConstraints(
-        maxWidth: 400,
-        maxHeight: 400,
-      ),
+      constraints: const BoxConstraints(maxWidth: 400, maxHeight: 400),
       child: AspectRatio(
         aspectRatio: 1.0,
         child: Container(
@@ -184,7 +253,7 @@ class OnboardScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              
+
               // Refrigerator illustration placeholder
               // In a real app, you would use an actual image asset here
               // For now, using a simplified version similar to welcome_screen
@@ -216,7 +285,7 @@ class OnboardScreen extends StatelessWidget {
               ),
             ),
           ),
-          
+
           // Refrigerator body
           Positioned(
             bottom: 16,
@@ -226,10 +295,7 @@ class OnboardScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 color: const Color(0xFFD0D0D0),
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: const Color(0xFF9E9E9E),
-                  width: 2,
-                ),
+                border: Border.all(color: const Color(0xFF9E9E9E), width: 2),
               ),
               child: Stack(
                 children: [
@@ -249,36 +315,27 @@ class OnboardScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  
+
                   // Shelves
                   Positioned(
                     top: 40,
                     left: 8,
                     right: 8,
-                    child: Container(
-                      height: 2,
-                      color: const Color(0xFF9E9E9E),
-                    ),
+                    child: Container(height: 2, color: const Color(0xFF9E9E9E)),
                   ),
                   Positioned(
                     top: 100,
                     left: 8,
                     right: 8,
-                    child: Container(
-                      height: 2,
-                      color: const Color(0xFF9E9E9E),
-                    ),
+                    child: Container(height: 2, color: const Color(0xFF9E9E9E)),
                   ),
                   Positioned(
                     top: 160,
                     left: 8,
                     right: 8,
-                    child: Container(
-                      height: 2,
-                      color: const Color(0xFF9E9E9E),
-                    ),
+                    child: Container(height: 2, color: const Color(0xFF9E9E9E)),
                   ),
-                  
+
                   // Food items - fruits and vegetables
                   Positioned(
                     top: 50,
@@ -364,7 +421,7 @@ class OnboardScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  
+
                   // Drawers
                   Positioned(
                     bottom: 20,
@@ -375,9 +432,7 @@ class OnboardScreen extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: const Color(0xFFE0E0E0).withValues(alpha: 0.6),
                         borderRadius: BorderRadius.circular(4),
-                        border: Border.all(
-                          color: const Color(0xFF9E9E9E),
-                        ),
+                        border: Border.all(color: const Color(0xFF9E9E9E)),
                       ),
                     ),
                   ),
@@ -390,9 +445,7 @@ class OnboardScreen extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: const Color(0xFFE0E0E0).withValues(alpha: 0.6),
                         borderRadius: BorderRadius.circular(4),
-                        border: Border.all(
-                          color: const Color(0xFF9E9E9E),
-                        ),
+                        border: Border.all(color: const Color(0xFF9E9E9E)),
                       ),
                     ),
                   ),
@@ -418,4 +471,3 @@ class OnboardScreen extends StatelessWidget {
     );
   }
 }
-
