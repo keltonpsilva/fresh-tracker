@@ -3,7 +3,6 @@ import '../models/food_item.dart';
 
 class NotificationItemCard extends StatelessWidget {
   final FoodItem item;
-  final String storageLocation;
   final VoidCallback onMarkAsConsumed;
   final VoidCallback onDelete;
   final VoidCallback onEdit;
@@ -12,14 +11,27 @@ class NotificationItemCard extends StatelessWidget {
   const NotificationItemCard({
     super.key,
     required this.item,
-    required this.storageLocation,
     required this.onMarkAsConsumed,
     required this.onDelete,
     required this.onEdit,
     this.onTap,
   });
 
+  String _getStorageLocation() {
+    // Map categories to storage locations
+    switch (item.category.toLowerCase()) {
+      case 'dairy':
+      case 'meat':
+        return 'Fridge';
+      case 'produce':
+        return 'Counter';
+      default:
+        return 'Fridge'; // Default to fridge
+    }
+  }
+
   IconData _getStorageIcon() {
+    final storageLocation = _getStorageLocation();
     return storageLocation == 'Fridge' ? Icons.ac_unit : Icons.countertops;
   }
 
@@ -79,10 +91,7 @@ class NotificationItemCard extends StatelessWidget {
                 leading: const Icon(Icons.edit, color: Color(0xFF2C2C2C)),
                 title: const Text(
                   'Edit',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Color(0xFF2C2C2C),
-                  ),
+                  style: TextStyle(fontSize: 16, color: Color(0xFF2C2C2C)),
                 ),
                 onTap: () {
                   Navigator.of(context).pop();
@@ -94,10 +103,7 @@ class NotificationItemCard extends StatelessWidget {
                 leading: const Icon(Icons.check, color: Color(0xFF4CAF50)),
                 title: const Text(
                   'Mark as Consumed',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Color(0xFF2C2C2C),
-                  ),
+                  style: TextStyle(fontSize: 16, color: Color(0xFF2C2C2C)),
                 ),
                 onTap: () {
                   Navigator.of(context).pop();
@@ -109,10 +115,7 @@ class NotificationItemCard extends StatelessWidget {
                 leading: Icon(Icons.delete_outline, color: Colors.red[700]),
                 title: Text(
                   'Delete',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.red[700],
-                  ),
+                  style: TextStyle(fontSize: 16, color: Colors.red[700]),
                 ),
                 onTap: () {
                   Navigator.of(context).pop();
@@ -215,7 +218,7 @@ class NotificationItemCard extends StatelessWidget {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                storageLocation,
+                                _getStorageLocation(),
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: Colors.grey[600],

@@ -91,19 +91,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
-  String _getStorageLocation(FoodItem item) {
-    // Map categories to storage locations
-    switch (item.category.toLowerCase()) {
-      case 'dairy':
-      case 'meat':
-        return 'Fridge';
-      case 'produce':
-        return 'Counter';
-      default:
-        return 'Fridge'; // Default to fridge
-    }
-  }
-
   Future<void> _markAsConsumed(FoodItem item) async {
     try {
       await _foodItemService.removeItem(item);
@@ -475,7 +462,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         final item = _filteredItems[index];
                         return NotificationItemCard(
                           item: item,
-                          storageLocation: _getStorageLocation(item),
                           onTap: () async {
                             await Navigator.of(context).push(
                               MaterialPageRoute(

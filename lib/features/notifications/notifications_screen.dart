@@ -101,19 +101,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     }).toList();
   }
 
-  String _getStorageLocation(FoodItem item) {
-    // Map categories to storage locations
-    switch (item.category.toLowerCase()) {
-      case 'dairy':
-      case 'meat':
-        return 'Fridge';
-      case 'produce':
-        return 'Counter';
-      default:
-        return 'Fridge'; // Default to fridge
-    }
-  }
-
   Future<void> _markAsConsumed(FoodItem item) async {
     try {
       await _foodItemService.removeItem(item);
@@ -350,15 +337,16 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             ..._expiringToday.map(
               (item) => NotificationItemCard(
                 item: item,
-                storageLocation: _getStorageLocation(item),
                 onMarkAsConsumed: () => _markAsConsumed(item),
                 onDelete: () => _deleteItem(item),
                 onEdit: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => EditItemScreen(item: item),
-                    ),
-                  ).then((_) => _loadItems());
+                  Navigator.of(context)
+                      .push(
+                        MaterialPageRoute(
+                          builder: (context) => EditItemScreen(item: item),
+                        ),
+                      )
+                      .then((_) => _loadItems());
                 },
                 onTap: () {
                   Navigator.of(context).push(
@@ -384,15 +372,16 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             ..._expiringThisWeek.map(
               (item) => NotificationItemCard(
                 item: item,
-                storageLocation: _getStorageLocation(item),
                 onMarkAsConsumed: () => _markAsConsumed(item),
                 onDelete: () => _deleteItem(item),
                 onEdit: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => EditItemScreen(item: item),
-                    ),
-                  ).then((_) => _loadItems());
+                  Navigator.of(context)
+                      .push(
+                        MaterialPageRoute(
+                          builder: (context) => EditItemScreen(item: item),
+                        ),
+                      )
+                      .then((_) => _loadItems());
                 },
                 onTap: () {
                   Navigator.of(context).push(
@@ -458,15 +447,16 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           ..._filteredItems.map(
             (item) => NotificationItemCard(
               item: item,
-              storageLocation: _getStorageLocation(item),
               onMarkAsConsumed: () => _markAsConsumed(item),
               onDelete: () => _deleteItem(item),
               onEdit: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => EditItemScreen(item: item),
-                  ),
-                ).then((_) => _loadItems());
+                Navigator.of(context)
+                    .push(
+                      MaterialPageRoute(
+                        builder: (context) => EditItemScreen(item: item),
+                      ),
+                    )
+                    .then((_) => _loadItems());
               },
               onTap: () {
                 Navigator.of(context).push(
