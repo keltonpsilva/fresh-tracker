@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../dashboard/dashboard_screen.dart';
 import '../../shared/services/app_preferences_service.dart';
+import '../../shared/services/food_item_service_factory.dart';
 
 class OnboardingSlide {
   final String title;
@@ -19,6 +20,7 @@ class OnboardScreen extends StatefulWidget {
 class _OnboardScreenState extends State<OnboardScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
+  bool _hasImportedDemoData = false;
 
   final List<OnboardingSlide> _slides = const [
     OnboardingSlide(
@@ -68,9 +70,36 @@ class _OnboardScreenState extends State<OnboardScreen> {
     }
   }
 
-  void _onSignInPressed(BuildContext context) {
-    // Navigate to sign in (for now, same as finish onboarding)
-    _finishOnboarding(context);
+  Future<void> _onImportDemoDataPressed(BuildContext context) async {
+    if (_hasImportedDemoData) return;
+
+    try {
+      final service = FoodItemServiceFactory.getService();
+      await service.importDemoData();
+
+      if (!context.mounted) return;
+
+      setState(() {
+        _hasImportedDemoData = true;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Demo data imported successfully!'),
+          duration: Duration(seconds: 2),
+          backgroundColor: Color(0xFF4CAF50),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error importing demo data: $e'),
+          duration: const Duration(seconds: 2),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   @override
@@ -201,9 +230,11 @@ class _OnboardScreenState extends State<OnboardScreen> {
 
                   const SizedBox(height: 8),
 
-                  // Sign In Button
+                  // Import Demo Data Button
                   TextButton(
-                    onPressed: () => _onSignInPressed(context),
+                    onPressed: _hasImportedDemoData
+                        ? null
+                        : () => _onImportDemoDataPressed(context),
                     style: TextButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16,
@@ -211,13 +242,15 @@ class _OnboardScreenState extends State<OnboardScreen> {
                       ),
                     ),
                     child: Text(
-                      'Sign In',
+                      'Import Demo Data',
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
-                        color: isDark
-                            ? Colors.grey[300]
-                            : const Color(0xFF888888),
+                        color: _hasImportedDemoData
+                            ? Colors.grey
+                            : (isDark
+                                  ? Colors.grey[300]
+                                  : const Color(0xFF888888)),
                       ),
                     ),
                   ),
