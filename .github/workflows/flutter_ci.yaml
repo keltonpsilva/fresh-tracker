@@ -120,7 +120,7 @@ jobs:
     uses: ./.github/workflows/create-tag.yaml
     if: github.event_name == 'push' && ((github.ref == 'refs/heads/main') || startsWith(github.ref_name, 'release'))
     with:
-      version: ${{ needs.generate-version.outputs.version }}
+      version: ${{ needs.generate-version.outputs.version-number }}
 
   # -------------------------------------------
   # 6. CREATE RELEASE
@@ -130,5 +130,5 @@ jobs:
     needs: [generate-version, create-tag]
     uses: ./.github/workflows/create-release.yaml
     with:
-      version: ${{ needs.generate-version.outputs.version }}
+      version: ${{ needs.generate-version.outputs.version-number }}
       prerelease: ${{ github.ref == 'refs/heads/main' }}
