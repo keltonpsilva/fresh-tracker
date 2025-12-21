@@ -4,14 +4,14 @@ import '../../shared/services/i_food_item_service.dart';
 import '../../shared/services/food_item_service_factory.dart';
 import '../../shared/widgets/info_dialog.dart';
 
-class AlertsScreen extends StatefulWidget {
-  const AlertsScreen({super.key});
+class NotificationsScreen extends StatefulWidget {
+  const NotificationsScreen({super.key});
 
   @override
-  State<AlertsScreen> createState() => _AlertsScreenState();
+  State<NotificationsScreen> createState() => _NotificationsScreenState();
 }
 
-class _AlertsScreenState extends State<AlertsScreen> {
+class _NotificationsScreenState extends State<NotificationsScreen> {
   late final IFoodItemService _foodItemService;
   final TextEditingController _searchController = TextEditingController();
   int _selectedTab = 0; // 0 = Upcoming, 1 = Expired
@@ -222,7 +222,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
                 children: [
                   const Expanded(
                     child: Text(
-                      'Alerts',
+                      'Notifications',
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
