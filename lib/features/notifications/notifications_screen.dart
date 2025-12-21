@@ -118,31 +118,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     return location == 'Fridge' ? Icons.ac_unit : Icons.countertops;
   }
 
-  String _getExpirationText(FoodItem item) {
-    final now = DateTime.now();
-    final difference = item.useByDate.difference(now);
-
-    if (difference.inDays < 0) {
-      // Expired
-      final daysAgo = -difference.inDays;
-      if (daysAgo == 1) {
-        return 'Expired yesterday';
-      }
-      return 'Expired $daysAgo days ago';
-    } else if (difference.inDays == 0) {
-      // Expiring today - show hours
-      final hours = difference.inHours;
-      if (hours <= 0) {
-        return 'Expired';
-      }
-      return 'Expires in $hours ${hours == 1 ? 'hour' : 'hours'}';
-    } else if (difference.inDays == 1) {
-      return 'Expires in 1 day';
-    } else {
-      return 'Expires in ${difference.inDays} days';
-    }
-  }
-
   Future<void> _markAsConsumed(FoodItem item) async {
     try {
       await _foodItemService.removeItem(item);
@@ -379,7 +354,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             ..._expiringToday.map(
               (item) => NotificationItemCard(
                 item: item,
-                expirationText: _getExpirationText(item),
                 storageLocation: _getStorageLocation(item),
                 storageIcon: _getStorageIcon(item),
                 onMarkAsConsumed: () => _markAsConsumed(item),
@@ -408,7 +382,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             ..._expiringThisWeek.map(
               (item) => NotificationItemCard(
                 item: item,
-                expirationText: _getExpirationText(item),
                 storageLocation: _getStorageLocation(item),
                 storageIcon: _getStorageIcon(item),
                 onMarkAsConsumed: () => _markAsConsumed(item),
@@ -477,7 +450,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           ..._filteredItems.map(
             (item) => NotificationItemCard(
               item: item,
-              expirationText: _getExpirationText(item),
               storageLocation: _getStorageLocation(item),
               storageIcon: _getStorageIcon(item),
               onMarkAsConsumed: () => _markAsConsumed(item),

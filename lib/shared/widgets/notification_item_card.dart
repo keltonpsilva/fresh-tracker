@@ -3,7 +3,6 @@ import '../models/food_item.dart';
 
 class NotificationItemCard extends StatelessWidget {
   final FoodItem item;
-  final String expirationText;
   final String storageLocation;
   final IconData storageIcon;
   final VoidCallback onMarkAsConsumed;
@@ -13,13 +12,37 @@ class NotificationItemCard extends StatelessWidget {
   const NotificationItemCard({
     super.key,
     required this.item,
-    required this.expirationText,
     required this.storageLocation,
     required this.storageIcon,
     required this.onMarkAsConsumed,
     required this.onDelete,
     this.onTap,
   });
+
+  String _getExpirationText() {
+    final now = DateTime.now();
+    final difference = item.useByDate.difference(now);
+
+    if (difference.inDays < 0) {
+      // Expired
+      final daysAgo = -difference.inDays;
+      if (daysAgo == 1) {
+        return 'Expired yesterday';
+      }
+      return 'Expired $daysAgo days ago';
+    } else if (difference.inDays == 0) {
+      // Expiring today - show hours
+      final hours = difference.inHours;
+      if (hours <= 0) {
+        return 'Expired';
+      }
+      return 'Expires in $hours ${hours == 1 ? 'hour' : 'hours'}';
+    } else if (difference.inDays == 1) {
+      return 'Expires in 1 day';
+    } else {
+      return 'Expires in ${difference.inDays} days';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -92,7 +115,7 @@ class NotificationItemCard extends StatelessWidget {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            expirationText,
+                            _getExpirationText(),
                             style: TextStyle(
                               fontSize: 14,
                               color: item.statusColor,
