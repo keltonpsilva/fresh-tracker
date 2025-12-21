@@ -6,6 +6,7 @@ class NotificationItemCard extends StatelessWidget {
   final String storageLocation;
   final VoidCallback onMarkAsConsumed;
   final VoidCallback onDelete;
+  final VoidCallback onEdit;
   final VoidCallback? onTap;
 
   const NotificationItemCard({
@@ -14,6 +15,7 @@ class NotificationItemCard extends StatelessWidget {
     required this.storageLocation,
     required this.onMarkAsConsumed,
     required this.onDelete,
+    required this.onEdit,
     this.onTap,
   });
 
@@ -151,45 +153,68 @@ class NotificationItemCard extends StatelessWidget {
             ),
           ),
 
-          // Action buttons
+          // Action menu button
           Padding(
-            padding: const EdgeInsets.only(right: 12.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Checkmark button
-                GestureDetector(
-                  onTap: onMarkAsConsumed,
-                  child: Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFE5F5E5),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.check,
-                      color: Color(0xFF4CAF50),
-                      size: 20,
-                    ),
+            padding: const EdgeInsets.only(right: 8.0),
+            child: PopupMenuButton<String>(
+              icon: Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.more_vert,
+                  color: Color(0xFF2C2C2C),
+                  size: 20,
+                ),
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              onSelected: (value) {
+                switch (value) {
+                  case 'edit':
+                    onEdit();
+                    break;
+                  case 'mark_consumed':
+                    onMarkAsConsumed();
+                    break;
+                  case 'delete':
+                    onDelete();
+                    break;
+                }
+              },
+              itemBuilder: (BuildContext context) => [
+                PopupMenuItem<String>(
+                  value: 'edit',
+                  child: Row(
+                    children: [
+                      Icon(Icons.edit, size: 20, color: Colors.grey[700]),
+                      const SizedBox(width: 12),
+                      const Text('Edit'),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 8),
-                // Trash button
-                GestureDetector(
-                  onTap: onDelete,
-                  child: Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[200],
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.delete_outline,
-                      color: Color(0xFF2C2C2C),
-                      size: 20,
-                    ),
+                PopupMenuItem<String>(
+                  value: 'mark_consumed',
+                  child: Row(
+                    children: [
+                      Icon(Icons.check, size: 20, color: const Color(0xFF4CAF50)),
+                      const SizedBox(width: 12),
+                      const Text('Mark as Consumed'),
+                    ],
+                  ),
+                ),
+                PopupMenuItem<String>(
+                  value: 'delete',
+                  child: Row(
+                    children: [
+                      Icon(Icons.delete_outline, size: 20, color: Colors.red[700]),
+                      const SizedBox(width: 12),
+                      Text('Delete', style: TextStyle(color: Colors.red[700])),
+                    ],
                   ),
                 ),
               ],

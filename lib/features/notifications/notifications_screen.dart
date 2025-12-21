@@ -5,6 +5,7 @@ import '../../shared/services/food_item_service_factory.dart';
 import '../../shared/widgets/info_dialog.dart';
 import '../../shared/widgets/notification_item_card.dart';
 import '../item_details/item_details_screen.dart';
+import '../edit_item/edit_item_screen.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -352,6 +353,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 storageLocation: _getStorageLocation(item),
                 onMarkAsConsumed: () => _markAsConsumed(item),
                 onDelete: () => _deleteItem(item),
+                onEdit: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => EditItemScreen(item: item),
+                    ),
+                  ).then((_) => _loadItems());
+                },
                 onTap: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(
@@ -379,6 +387,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 storageLocation: _getStorageLocation(item),
                 onMarkAsConsumed: () => _markAsConsumed(item),
                 onDelete: () => _deleteItem(item),
+                onEdit: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => EditItemScreen(item: item),
+                    ),
+                  ).then((_) => _loadItems());
+                },
                 onTap: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(
@@ -446,6 +461,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               storageLocation: _getStorageLocation(item),
               onMarkAsConsumed: () => _markAsConsumed(item),
               onDelete: () => _deleteItem(item),
+              onEdit: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => EditItemScreen(item: item),
+                  ),
+                ).then((_) => _loadItems());
+              },
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
