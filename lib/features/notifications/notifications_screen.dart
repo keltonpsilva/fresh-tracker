@@ -3,7 +3,7 @@ import '../../shared/models/food_item.dart';
 import '../../shared/services/i_food_item_service.dart';
 import '../../shared/services/food_item_service_factory.dart';
 import '../../shared/widgets/info_dialog.dart';
-import '../../shared/widgets/notification_item_card.dart';
+import '../../shared/widgets/food_item_card.dart';
 import '../item_details/item_details_screen.dart';
 import '../edit_item/edit_item_screen.dart';
 
@@ -354,7 +354,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             ),
             const SizedBox(height: 12),
             ..._expiringToday.map(
-              (item) => NotificationItemCard(
+              (item) => FoodItemCard(
                 item: item,
                 onMarkAsConsumed: () => _markAsConsumed(item),
                 onDelete: () => _deleteItem(item),
@@ -389,7 +389,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             ),
             const SizedBox(height: 12),
             ..._expiringThisWeek.map(
-              (item) => NotificationItemCard(
+              (item) => FoodItemCard(
                 item: item,
                 onMarkAsConsumed: () => _markAsConsumed(item),
                 onDelete: () => _deleteItem(item),
@@ -464,7 +464,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           ),
           const SizedBox(height: 12),
           ..._filteredItems.map(
-            (item) => NotificationItemCard(
+            (item) => FoodItemCard(
               item: item,
               onMarkAsConsumed: () => _markAsConsumed(item),
               onDelete: () => _deleteItem(item),

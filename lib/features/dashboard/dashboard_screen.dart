@@ -9,7 +9,7 @@ import '../../shared/models/food_item.dart';
 import '../../shared/services/i_food_item_service.dart';
 import '../../shared/services/food_item_service_factory.dart';
 import '../../shared/widgets/info_dialog.dart';
-import '../../shared/widgets/notification_item_card.dart';
+import '../../shared/widgets/food_item_card.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -460,7 +460,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       itemCount: _filteredItems.length,
                       itemBuilder: (context, index) {
                         final item = _filteredItems[index];
-                        return NotificationItemCard(
+                        return FoodItemCard(
                           item: item,
                           onTap: () async {
                             await Navigator.of(context).push(
