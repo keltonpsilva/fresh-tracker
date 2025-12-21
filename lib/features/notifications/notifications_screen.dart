@@ -212,7 +212,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               child: Container(
                 height: 40,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE5E5E5).withOpacity(0.8),
+                  color: const Color(0xFFE5E5E5).withValues(alpha: 0.8),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 padding: const EdgeInsets.all(4),
@@ -231,7 +231,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                             boxShadow: _selectedTab == 0
                                 ? [
                                     BoxShadow(
-                                      color: Colors.black.withOpacity(0.05),
+                                      color: Colors.black.withValues(
+                                        alpha: 0.05,
+                                      ),
                                       blurRadius: 2,
                                       offset: const Offset(0, 1),
                                     ),
@@ -266,7 +268,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                             boxShadow: _selectedTab == 1
                                 ? [
                                     BoxShadow(
-                                      color: Colors.black.withOpacity(0.05),
+                                      color: Colors.black.withValues(
+                                        alpha: 0.05,
+                                      ),
                                       blurRadius: 2,
                                       offset: const Offset(0, 1),
                                     ),
