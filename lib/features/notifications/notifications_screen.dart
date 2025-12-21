@@ -3,6 +3,7 @@ import '../../shared/models/food_item.dart';
 import '../../shared/services/i_food_item_service.dart';
 import '../../shared/services/food_item_service_factory.dart';
 import '../../shared/widgets/info_dialog.dart';
+import '../../shared/widgets/notification_item_card.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -379,7 +380,16 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               ),
             ),
             const SizedBox(height: 12),
-            ..._expiringToday.map((item) => _buildItemCard(item)),
+            ..._expiringToday.map(
+              (item) => NotificationItemCard(
+                item: item,
+                expirationText: _getExpirationText(item),
+                storageLocation: _getStorageLocation(item),
+                storageIcon: _getStorageIcon(item),
+                onMarkAsConsumed: () => _markAsConsumed(item),
+                onDelete: () => _deleteItem(item),
+              ),
+            ),
             const SizedBox(height: 24),
           ],
           if (_expiringThisWeek.isNotEmpty) ...[
@@ -392,7 +402,16 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               ),
             ),
             const SizedBox(height: 12),
-            ..._expiringThisWeek.map((item) => _buildItemCard(item)),
+            ..._expiringThisWeek.map(
+              (item) => NotificationItemCard(
+                item: item,
+                expirationText: _getExpirationText(item),
+                storageLocation: _getStorageLocation(item),
+                storageIcon: _getStorageIcon(item),
+                onMarkAsConsumed: () => _markAsConsumed(item),
+                onDelete: () => _deleteItem(item),
+              ),
+            ),
             const SizedBox(height: 24),
           ],
           if (_expiringToday.isEmpty && _expiringThisWeek.isEmpty)
@@ -445,144 +464,17 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             ),
           ),
           const SizedBox(height: 12),
-          ..._filteredItems.map((item) => _buildItemCard(item)),
+          ..._filteredItems.map(
+            (item) => NotificationItemCard(
+              item: item,
+              expirationText: _getExpirationText(item),
+              storageLocation: _getStorageLocation(item),
+              storageIcon: _getStorageIcon(item),
+              onMarkAsConsumed: () => _markAsConsumed(item),
+              onDelete: () => _deleteItem(item),
+            ),
+          ),
           const SizedBox(height: 24),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildItemCard(FoodItem item) {
-    final storageLocation = _getStorageLocation(item);
-    final storageIcon = _getStorageIcon(item);
-    final expirationText = _getExpirationText(item);
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          // Orange status bar
-          Container(
-            width: 4,
-            height: 100,
-            decoration: const BoxDecoration(
-              color: Colors.orange,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(12),
-                bottomLeft: Radius.circular(12),
-              ),
-            ),
-          ),
-
-          // Item image/icon
-          Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Container(
-              width: 56,
-              height: 56,
-              decoration: BoxDecoration(
-                color: item.iconBackgroundColor,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(item.icon, color: item.statusColor, size: 28),
-            ),
-          ),
-
-          // Item details
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    item.name,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF2C2C2C),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    expirationText,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Colors.orange,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Icon(storageIcon, size: 16, color: Colors.grey[600]),
-                      const SizedBox(width: 4),
-                      Text(
-                        storageLocation,
-                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          // Action buttons
-          Padding(
-            padding: const EdgeInsets.only(right: 12.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Checkmark button
-                GestureDetector(
-                  onTap: () => _markAsConsumed(item),
-                  child: Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFE5F5E5),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.check,
-                      color: Color(0xFF4CAF50),
-                      size: 20,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                // Trash button
-                GestureDetector(
-                  onTap: () => _deleteItem(item),
-                  child: Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[200],
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.delete_outline,
-                      color: Color(0xFF2C2C2C),
-                      size: 20,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
         ],
       ),
     );
