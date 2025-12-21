@@ -199,12 +199,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                       textAlign: TextAlign.center,
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.settings, color: Color(0xFF2C2C2C)),
-                    onPressed: () {
-                      // TODO: Open settings
-                    },
-                  ),
                 ],
               ),
             ),
