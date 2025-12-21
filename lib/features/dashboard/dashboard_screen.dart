@@ -9,7 +9,7 @@ import '../../shared/models/food_item.dart';
 import '../../shared/services/i_food_item_service.dart';
 import '../../shared/services/food_item_service_factory.dart';
 import '../../shared/widgets/info_dialog.dart';
-import '../../shared/widgets/food_item_card.dart';
+import '../../shared/widgets/notification_item_card.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -84,6 +84,43 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Failed to delete item'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  String _getStorageLocation(FoodItem item) {
+    // Map categories to storage locations
+    switch (item.category.toLowerCase()) {
+      case 'dairy':
+      case 'meat':
+        return 'Fridge';
+      case 'produce':
+        return 'Counter';
+      default:
+        return 'Fridge'; // Default to fridge
+    }
+  }
+
+  Future<void> _markAsConsumed(FoodItem item) async {
+    try {
+      await _foodItemService.removeItem(item);
+      _loadItems();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${item.name} marked as consumed'),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to mark item as consumed'),
             backgroundColor: Colors.red,
           ),
         );
@@ -436,8 +473,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       itemCount: _filteredItems.length,
                       itemBuilder: (context, index) {
                         final item = _filteredItems[index];
-                        return FoodItemCard(
+                        return NotificationItemCard(
                           item: item,
+                          storageLocation: _getStorageLocation(item),
                           onTap: () async {
                             await Navigator.of(context).push(
                               MaterialPageRoute(
@@ -458,6 +496,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           },
                           onDelete: () {
                             _showDeleteConfirmation(item);
+                          },
+                          onMarkAsConsumed: () {
+                            _markAsConsumed(item);
                           },
                         );
                       },
