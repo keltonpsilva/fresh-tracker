@@ -7,6 +7,7 @@ import '../add_item/add_item_screen.dart';
 import '../item_details/item_details_screen.dart';
 import '../barcode_scanner/barcode_scanner_screen.dart';
 import '../edit_item/edit_item_screen.dart';
+import '../notifications/notifications_screen.dart';
 import '../../shared/models/food_item.dart';
 import '../../shared/services/i_food_item_service.dart';
 import '../../shared/services/food_item_service_factory.dart';
@@ -365,7 +366,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       color: Color(0xFF2C2C2C),
                     ),
                     onPressed: () {
-                      // TODO: Open notifications
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const NotificationsScreen(),
+                        ),
+                      );
                     },
                   ),
                 ],

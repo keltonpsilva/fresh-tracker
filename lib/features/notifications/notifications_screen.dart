@@ -45,7 +45,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     var items = _allItems.where((item) {
       final now = DateTime.now();
       final difference = item.useByDate.difference(now);
-      
+
       if (_selectedTab == 0) {
         // Upcoming: items that haven't expired yet
         return difference.inDays >= 0;
@@ -58,9 +58,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     // Apply search filter
     if (_searchController.text.isNotEmpty) {
       final query = _searchController.text.toLowerCase();
-      items = items.where((item) => 
-        item.name.toLowerCase().contains(query)
-      ).toList();
+      items = items
+          .where((item) => item.name.toLowerCase().contains(query))
+          .toList();
     }
 
     return items;
@@ -83,7 +83,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final weekFromNow = today.add(const Duration(days: 7));
-    
+
     return _filteredItems.where((item) {
       final itemDate = DateTime(
         item.useByDate.year,
@@ -91,11 +91,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         item.useByDate.day,
       );
       final todayDate = DateTime(now.year, now.month, now.day);
-      
+
       // Exclude items expiring today (they're in the "Expiring Today" section)
-      return itemDate.isAfter(todayDate) && 
-             itemDate.isBefore(weekFromNow) || 
-             itemDate.isAtSameMomentAs(weekFromNow);
+      return itemDate.isAfter(todayDate) && itemDate.isBefore(weekFromNow) ||
+          itemDate.isAtSameMomentAs(weekFromNow);
     }).toList();
   }
 
@@ -120,7 +119,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   String _getExpirationText(FoodItem item) {
     final now = DateTime.now();
     final difference = item.useByDate.difference(now);
-    
+
     if (difference.inDays < 0) {
       // Expired
       final daysAgo = -difference.inDays;
@@ -170,7 +169,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     InfoDialog.showConfirmation(
       context: context,
       title: 'Delete Item',
-      message: 'Are you sure you want to delete "${item.name}"? This action cannot be undone.',
+      message:
+          'Are you sure you want to delete "${item.name}"? This action cannot be undone.',
       confirmText: 'Delete',
       cancelText: 'Cancel',
       onConfirm: () async {
@@ -207,7 +207,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final hasUpcomingItems = _expiringToday.isNotEmpty || _expiringThisWeek.isNotEmpty;
+    final hasUpcomingItems =
+        _expiringToday.isNotEmpty || _expiringThisWeek.isNotEmpty;
     final hasExpiredItems = _selectedTab == 1 && _filteredItems.isNotEmpty;
 
     return Scaffold(
@@ -217,7 +218,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           children: [
             // Header
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 12.0,
+              ),
               child: Row(
                 children: [
                   const Expanded(
@@ -257,7 +261,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           decoration: BoxDecoration(
-                            color: _selectedTab == 0 ? Colors.white : Colors.transparent,
+                            color: _selectedTab == 0
+                                ? Colors.white
+                                : Colors.transparent,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: const Text(
@@ -278,7 +284,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           decoration: BoxDecoration(
-                            color: _selectedTab == 1 ? Colors.white : Colors.transparent,
+                            color: _selectedTab == 1
+                                ? Colors.white
+                                : Colors.transparent,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
@@ -286,9 +294,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
-                              color: _selectedTab == 1 
-                                ? const Color(0xFF2C2C2C)
-                                : Colors.grey[600],
+                              color: _selectedTab == 1
+                                  ? const Color(0xFF2C2C2C)
+                                  : Colors.grey[600],
                             ),
                             textAlign: TextAlign.center,
                           ),
@@ -333,8 +341,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               child: _isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : _selectedTab == 0
-                      ? _buildUpcomingContent(hasUpcomingItems)
-                      : _buildExpiredContent(hasExpiredItems),
+                  ? _buildUpcomingContent(hasUpcomingItems)
+                  : _buildExpiredContent(hasExpiredItems),
             ),
           ],
         ),
@@ -513,10 +521,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                       const SizedBox(width: 4),
                       Text(
                         storageLocation,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey[600],
-                        ),
+                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                       ),
                     ],
                   ),
@@ -606,10 +611,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             const SizedBox(height: 12),
             Text(
               'No items are expiring soon. Great job managing your inventory!',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[600],
-              ),
+              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
           ],
@@ -618,4 +620,3 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     );
   }
 }
-
