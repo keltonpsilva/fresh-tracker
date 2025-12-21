@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
-import 'features/welcome/welcome_screen.dart';
+import 'features/onboard/onboard_screen.dart';
 import 'features/dashboard/dashboard_screen.dart';
 import 'shared/services/app_preferences_service.dart';
 
@@ -70,6 +70,6 @@ class _AppInitializerState extends State<AppInitializer> {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    return _isFirstLaunch ? const WelcomeScreen() : const DashboardScreen();
+    return _isFirstLaunch ? const OnboardScreen() : const DashboardScreen();
   }
 }
