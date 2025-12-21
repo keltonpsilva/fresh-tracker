@@ -48,6 +48,85 @@ class NotificationItemCard extends StatelessWidget {
     }
   }
 
+  void _showActionMenu(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Handle bar
+              Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(top: 12, bottom: 8),
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              // Edit Option
+              ListTile(
+                leading: const Icon(Icons.edit, color: Color(0xFF2C2C2C)),
+                title: const Text(
+                  'Edit',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Color(0xFF2C2C2C),
+                  ),
+                ),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  onEdit();
+                },
+              ),
+              // Mark as Consumed Option
+              ListTile(
+                leading: const Icon(Icons.check, color: Color(0xFF4CAF50)),
+                title: const Text(
+                  'Mark as Consumed',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Color(0xFF2C2C2C),
+                  ),
+                ),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  onMarkAsConsumed();
+                },
+              ),
+              // Delete Option
+              ListTile(
+                leading: Icon(Icons.delete_outline, color: Colors.red[700]),
+                title: Text(
+                  'Delete',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.red[700],
+                  ),
+                ),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  onDelete();
+                },
+              ),
+              SizedBox(height: MediaQuery.of(context).padding.bottom),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -156,8 +235,9 @@ class NotificationItemCard extends StatelessWidget {
           // Action menu button
           Padding(
             padding: const EdgeInsets.only(right: 8.0),
-            child: PopupMenuButton<String>(
-              icon: Container(
+            child: GestureDetector(
+              onTap: () => _showActionMenu(context),
+              child: Container(
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
@@ -170,54 +250,6 @@ class NotificationItemCard extends StatelessWidget {
                   size: 20,
                 ),
               ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              onSelected: (value) {
-                switch (value) {
-                  case 'edit':
-                    onEdit();
-                    break;
-                  case 'mark_consumed':
-                    onMarkAsConsumed();
-                    break;
-                  case 'delete':
-                    onDelete();
-                    break;
-                }
-              },
-              itemBuilder: (BuildContext context) => [
-                PopupMenuItem<String>(
-                  value: 'edit',
-                  child: Row(
-                    children: [
-                      Icon(Icons.edit, size: 20, color: Colors.grey[700]),
-                      const SizedBox(width: 12),
-                      const Text('Edit'),
-                    ],
-                  ),
-                ),
-                PopupMenuItem<String>(
-                  value: 'mark_consumed',
-                  child: Row(
-                    children: [
-                      Icon(Icons.check, size: 20, color: const Color(0xFF4CAF50)),
-                      const SizedBox(width: 12),
-                      const Text('Mark as Consumed'),
-                    ],
-                  ),
-                ),
-                PopupMenuItem<String>(
-                  value: 'delete',
-                  child: Row(
-                    children: [
-                      Icon(Icons.delete_outline, size: 20, color: Colors.red[700]),
-                      const SizedBox(width: 12),
-                      Text('Delete', style: TextStyle(color: Colors.red[700])),
-                    ],
-                  ),
-                ),
-              ],
             ),
           ),
         ],
