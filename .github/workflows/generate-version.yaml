@@ -1,24 +1,23 @@
-name: Generate Version Early
+name: Generate Version
 
 on:
   workflow_call:
     outputs:
       version:
         description: "The full version number including 'v' prefix to use for the application"
-        value: ${{ jobs.generate-version-early.outputs.VERSION }}
+        value: ${{ jobs.generate-version.outputs.VERSION }}
       version-number:
         description: "The version number without the 'v' prefix to use for the application"
-        value: ${{ jobs.generate-version-early.outputs.VERSION_NUMBER }}
+        value: ${{ jobs.generate-version.outputs.VERSION_NUMBER }}
       build-name:
         description: "The build name (version without rc suffix) to use for Flutter builds"
-        value: ${{ jobs.generate-version-early.outputs.BUILD_NAME }}
+        value: ${{ jobs.generate-version.outputs.BUILD_NAME }}
       build-number:
         description: "The build number to use for Flutter builds"
-        value: ${{ jobs.generate-version-early.outputs.BUILD_NUMBER }}
+        value: ${{ jobs.generate-version.outputs.BUILD_NUMBER }}
 
 jobs:
-  generate-version-early:
-    name: Generate Version (Early)
+  generate-version:
     runs-on: ubuntu-latest
     outputs:
       VERSION: ${{ steps.generate-tag-version.outputs.VERSION }}
