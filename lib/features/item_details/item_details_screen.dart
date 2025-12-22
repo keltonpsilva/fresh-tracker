@@ -80,265 +80,269 @@ class ItemDetailsScreen extends StatelessWidget {
         ),
         centerTitle: true,
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Product Image Section
-                  Container(
-                    margin: const EdgeInsets.all(16),
-                    height: 200,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF1B5E20), // Dark green background
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Center(
-                      child: Icon(
-                        item.icon,
-                        size: 100,
-                        color: Colors.white.withValues(alpha: 0.9),
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Product Image Section
+                    Container(
+                      margin: const EdgeInsets.all(16),
+                      height: 200,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF1B5E20), // Dark green background
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Center(
+                        child: Icon(
+                          item.icon,
+                          size: 100,
+                          color: Colors.white.withValues(alpha: 0.9),
+                        ),
                       ),
                     ),
-                  ),
 
-                  // Freshness Indicator
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Freshness',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF2C2C2C),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: LinearProgressIndicator(
-                            value: freshnessProgress,
-                            minHeight: 8,
-                            backgroundColor: Colors.green[100],
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              daysRemaining <= 3 ? Colors.orange : Colors.green,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          daysRemaining < 0
-                              ? 'Expired ${-daysRemaining} ${-daysRemaining == 1 ? 'day' : 'days'} ago'
-                              : daysRemaining == 0
-                              ? 'Expires today'
-                              : daysRemaining == 1
-                              ? 'Expires Tomorrow'
-                              : 'Expires in $daysRemaining days',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: freshnessColor,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // Item Details List
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Column(
-                      children: [
-                        _buildDetailRow(
-                          icon: Icons.egg,
-                          label: 'Category',
-                          value: item.subcategory,
-                        ),
-                        const SizedBox(height: 16),
-                        _buildDetailRow(
-                          icon: Icons.inventory_2,
-                          label: 'Quantity',
-                          value: _getQuantityText(),
-                        ),
-                        const SizedBox(height: 16),
-                        _buildDetailRow(
-                          icon: Icons.calendar_today,
-                          label: 'Open Date',
-                          value: _formatDate(openDate),
-                        ),
-                        const SizedBox(height: 16),
-                        _buildDetailRow(
-                          icon: Icons.event_busy,
-                          label: 'Use By',
-                          value: _formatDate(item.useByDate),
-                          isBold: true,
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // Notes Section
-                  if (item.notes != null && item.notes!.isNotEmpty) ...[
+                    // Freshness Indicator
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.description,
-                                color: Colors.grey[600],
-                                size: 20,
+                          const Text(
+                            'Freshness',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF2C2C2C),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: LinearProgressIndicator(
+                              value: freshnessProgress,
+                              minHeight: 8,
+                              backgroundColor: Colors.green[100],
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                daysRemaining <= 3
+                                    ? Colors.orange
+                                    : Colors.green,
                               ),
-                              const SizedBox(width: 8),
-                              const Text(
-                                'Notes',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: Color(0xFF2C2C2C),
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            item.notes!,
+                            daysRemaining < 0
+                                ? 'Expired ${-daysRemaining} ${-daysRemaining == 1 ? 'day' : 'days'} ago'
+                                : daysRemaining == 0
+                                ? 'Expires today'
+                                : daysRemaining == 1
+                                ? 'Expires Tomorrow'
+                                : 'Expires in $daysRemaining days',
                             style: TextStyle(
                               fontSize: 14,
-                              color: Colors.grey[700],
-                              height: 1.5,
+                              color: freshnessColor,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ],
                       ),
                     ),
+
                     const SizedBox(height: 24),
+
+                    // Item Details List
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Column(
+                        children: [
+                          _buildDetailRow(
+                            icon: Icons.egg,
+                            label: 'Category',
+                            value: item.subcategory,
+                          ),
+                          const SizedBox(height: 16),
+                          _buildDetailRow(
+                            icon: Icons.inventory_2,
+                            label: 'Quantity',
+                            value: _getQuantityText(),
+                          ),
+                          const SizedBox(height: 16),
+                          _buildDetailRow(
+                            icon: Icons.calendar_today,
+                            label: 'Open Date',
+                            value: _formatDate(openDate),
+                          ),
+                          const SizedBox(height: 16),
+                          _buildDetailRow(
+                            icon: Icons.event_busy,
+                            label: 'Use By',
+                            value: _formatDate(item.useByDate),
+                            isBold: true,
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    // Notes Section
+                    if (item.notes != null && item.notes!.isNotEmpty) ...[
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.description,
+                                  color: Colors.grey[600],
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 8),
+                                const Text(
+                                  'Notes',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFF2C2C2C),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              item.notes!,
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey[700],
+                                height: 1.5,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                    ],
                   ],
-                ],
+                ),
               ),
             ),
-          ),
 
-          // Bottom Action Buttons
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, -2),
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                // Edit Button
-                Container(
-                  width: 56,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    shape: BoxShape.circle,
+            // Bottom Action Buttons
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, -2),
                   ),
-                  child: IconButton(
-                    icon: const Icon(Icons.edit, color: Color(0xFF2C2C2C)),
-                    onPressed: () async {
-                      await Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => EditItemScreen(item: item),
-                        ),
-                      );
-                      // Reload the item details by popping and letting parent refresh
-                      if (context.mounted) {
-                        Navigator.of(context).pop();
-                      }
-                    },
-                  ),
-                ),
-
-                // Mark as Consumed Button
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                    child: ElevatedButton(
+                ],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  // Edit Button
+                  Container(
+                    width: 56,
+                    height: 56,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      shape: BoxShape.circle,
+                    ),
+                    child: IconButton(
+                      icon: const Icon(Icons.edit, color: Color(0xFF2C2C2C)),
                       onPressed: () async {
-                        await _foodItemService.removeItem(item);
+                        await Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => EditItemScreen(item: item),
+                          ),
+                        );
+                        // Reload the item details by popping and letting parent refresh
                         if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Item marked as consumed'),
-                            ),
-                          );
                           Navigator.of(context).pop();
                         }
                       },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF4CAF50),
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                      ),
-                      child: const Text(
-                        'Mark as Consumed',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
                     ),
                   ),
-                ),
 
-                // Delete Button
-                Container(
-                  width: 56,
-                  height: 56,
-                  decoration: const BoxDecoration(
-                    color: Colors.red,
-                    shape: BoxShape.circle,
-                  ),
-                  child: IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.white),
-                    onPressed: () {
-                      InfoDialog.showConfirmation(
-                        context: context,
-                        title: 'Delete Item',
-                        message: 'Are you sure you want to delete this item?',
-                        confirmText: 'Delete',
-                        cancelText: 'Cancel',
-                        onConfirm: () async {
+                  // Mark as Consumed Button
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                      child: ElevatedButton(
+                        onPressed: () async {
                           await _foodItemService.removeItem(item);
                           if (context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Item deleted')),
+                              const SnackBar(
+                                content: Text('Item marked as consumed'),
+                              ),
                             );
                             Navigator.of(context).pop();
                           }
                         },
-                      );
-                    },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF4CAF50),
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                        ),
+                        child: const Text(
+                          'Mark as Consumed',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-              ],
+
+                  // Delete Button
+                  Container(
+                    width: 56,
+                    height: 56,
+                    decoration: const BoxDecoration(
+                      color: Colors.red,
+                      shape: BoxShape.circle,
+                    ),
+                    child: IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.white),
+                      onPressed: () {
+                        InfoDialog.showConfirmation(
+                          context: context,
+                          title: 'Delete Item',
+                          message: 'Are you sure you want to delete this item?',
+                          confirmText: 'Delete',
+                          cancelText: 'Cancel',
+                          onConfirm: () async {
+                            await _foodItemService.removeItem(item);
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Item deleted')),
+                              );
+                              Navigator.of(context).pop();
+                            }
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
